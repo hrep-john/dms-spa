@@ -1,0 +1,25 @@
+{
+  "current_version": "1.0.0",
+  "versions": [
+    {
+      "release_number": "1.0.0",
+      "date": "2022-07-18",
+      "features": [
+        {
+          "subject": "Document Management",
+          "description": "Users can now view, add, edit, delete, and download a documents."
+        },
+        {
+          "subject": "User Management",
+          "description": "Admin users can now view, add, edit, and delete a user."
+        },
+        {
+          "subject": "Forgot/Reset Password",
+          "description": "Users may able to reset his/her password."
+        }
+      ],
+      "enhancements": [],
+      "bug_fixes": []
+    }
+  ]
+}

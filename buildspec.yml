@@ -1,0 +1,19 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - printenv > .env
+      - echo "Showing env configs"
+      - cat .env
+      - echo Installing app dependencies...
+      - yarn install
+  build:
+    commands:
+      - echo Building app
+      - yarn run build
+artifacts:
+  files:
+    - '**/*'
+  discard-paths: no
+  base-directory: dist
