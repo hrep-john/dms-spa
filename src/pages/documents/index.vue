@@ -40,6 +40,7 @@ const service = documentServices.actions
 const udfService = udfServices.actions
 const isLoading = ref(false)
 const isProcessing = ref(false)
+const scrollComponent = ref(null)
 
 const page = ref(1)
 const datagrid = ref({ data: [], meta: {} })
@@ -151,7 +152,9 @@ const clearRecords = () => {
 }
 
 const loadMore = () => {
-  paginate(++page.value)
+  if (!isLoading.value && !isLastPage.value && datagrid.value.data.length > 0) {
+    paginate(++page.value)
+  }
 }
 
 const getFilterName = (field: string) => {
@@ -241,14 +244,23 @@ const showDeleteConfirmation = () => {
 }
 
 onMounted(() => {
+  window.addEventListener('scroll', handleScroll)
   initializeFilterOptions()
   paginate(1, true)
 })
 
 onBeforeUnmount(() => {
+  window.removeEventListener('scroll', handleScroll)
   filtermixins.setFilterDropdown([])
   fetchSearchAutocomplete.cancel()
 })
+
+const handleScroll = (e) => {
+  let element = scrollComponent.value
+  if (element.getBoundingClientRect().bottom < window.innerHeight) {
+    loadMore()
+  }
+}
 
 const clearSearchRecords = () => {
   options.value = []
@@ -434,7 +446,7 @@ watch(
 <template>
   <SidebarLayout>
     <!-- Content Wrapper -->
-    <div class="page-content-inner">
+    <div class="page-content-inner" ref="scrollComponent">
       <!--
           Page content goes here
 
