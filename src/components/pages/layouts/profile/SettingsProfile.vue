@@ -10,6 +10,10 @@ const currentVersion = computed(() => {
 })
 
 const user = computed(() => {
+  if (userSession.user === undefined) {
+    return {}
+  }
+
   return JSON.parse(userSession.user)
 })
 
@@ -18,11 +22,22 @@ const userRole = computed(() => {
 })
 
 const getUserProfilePicture = () => {
-  const userLocal = JSON.parse(userSession.user)
-  return userLocal.profile_picture_url == undefined || userLocal.profile_picture_url == ''
-    ? 'https://via.placeholder.com/150x150'
-    : userLocal.profile_picture_url
+  const profilePicture =
+    user.value.profile_picture_url || 'https://via.placeholder.com/150x150'
+  return profilePicture
 }
+
+const isSuperadmin = computed(() => {
+  const roles = userSession.roles ? JSON.parse(userSession.roles) : []
+
+  return roles.includes('superadmin')
+})
+
+const isAdmin = computed(() => {
+  const roles = userSession.roles ? JSON.parse(userSession.roles) : []
+
+  return isSuperadmin.value || roles.includes('admin')
+})
 </script>
 
 <template>
@@ -34,12 +49,38 @@ const getUserProfilePicture = () => {
         {{ user.first_name }} {{ user.last_name }}
       </h3>
       <p class="light-text is-uppercase mb-2">{{ userRole }}</p>
-      <VTag color="primary" :label="currentVersion" />
+      <RouterLink :to="{ name: 'settings-changelog' }">
+        <VTag color="primary" :label="currentVersion" />
+      </RouterLink>
     </div>
 
     <div class="profile-body mt-4">
       <div class="settings-section">
-        <RouterLink :to="{ name: 'settings-udfs' }" class="settings-box">
+        <a v-if="isAdmin" class="settings-box is-disabled">
+          <div class="edit-icon">
+            <i aria-hidden="true" class="lnil lnil-pencil"></i>
+          </div>
+
+          <VIconWrap dark="6" icon="lnil lnil-apartment" />
+
+          <span>Tenant</span>
+          <h3>Tenant Settings</h3>
+        </a>
+        <RouterLink
+          :to="{ name: 'settings-customization-edit' }"
+          v-if="isAdmin"
+          class="settings-box"
+        >
+          <div class="edit-icon">
+            <i aria-hidden="true" class="lnil lnil-pencil"></i>
+          </div>
+
+          <VIconWrap dark="6" icon="lnil lnil-cogs" />
+
+          <span>Customization</span>
+          <h3>Modify User Interface</h3>
+        </RouterLink>
+        <RouterLink :to="{ name: 'settings-udfs' }" v-if="isAdmin" class="settings-box">
           <div class="edit-icon">
             <i aria-hidden="true" class="lnil lnil-pencil"></i>
           </div>
@@ -49,7 +90,11 @@ const getUserProfilePicture = () => {
           <span>User Defined Field</span>
           <h3>Manage User Defined Fields</h3>
         </RouterLink>
-        <RouterLink :to="{ name: 'settings-changelog' }" class="settings-box">
+        <RouterLink
+          :to="{ name: 'settings-changelog' }"
+          class="settings-box"
+          :class="{ 'has-fullwidth': !isAdmin }"
+        >
           <div class="edit-icon">
             <i aria-hidden="true" class="lnil lnil-pencil"></i>
           </div>

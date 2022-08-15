@@ -1,3 +1,10 @@
+<route lang="yaml">
+meta:
+  rolesAllowed: 
+    - superadmin
+    - admin
+</route>
+
 <script setup lang="ts">
 /**
  * This is a Vue Component that will be
@@ -12,27 +19,60 @@
  */
 
 import { useHead } from '@vueuse/head'
+import { ref } from 'vue'
 import { useViewWrapper } from '/@src/stores/viewWrapper'
+import { handleVuexApiCall } from '/@src/utils/helper'
+import { useNotyf } from '/@src/composable/useNotyf'
+import { useRouter } from 'vue-router'
+import tenantSettingsService from '/@src/stores/tenantSettings'
+import { useUserSession } from '/@src/stores/userSession'
 
+const service = tenantSettingsService.actions
+const router = useRouter()
+const notyf = useNotyf()
 const viewWrapper = useViewWrapper()
-viewWrapper.setPageTitle('View Profile')
+const userSession = useUserSession()
+viewWrapper.setPageTitle('Customization')
+
+const isLoading = ref(false)
 
 useHead({
-  title: `View Profile - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `Customization - ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 
-const breadcrumb = [
-  {
-    label: 'Documents',
-    icon: 'feather:file',
-    to: {
-      name: 'documents',
-    },
-  },
-  {
-    label: 'View Metadata',
-  },
-]
+const onSubmitEventHandler = async (data: any) => {
+  isLoading.value = true
+
+  if (!isLoading.value) {
+    return
+  }
+
+  const user = JSON.parse(userSession.user)
+
+  const settings = data.map((item) => {
+    return {
+      ...item,
+      tenant_id: user.tenant_id,
+    }
+  })
+
+  const payload = {
+    tenant_id: user.tenant_id,
+    settings,
+  }
+
+  const response = await handleVuexApiCall(service.handleSyncTenantSettings, payload)
+
+  isLoading.value = false
+
+  if (response.success) {
+    notyf.success(response.data.message)
+    router.push({ name: 'settings' })
+  } else {
+    const error = response?.body?.message
+    notyf.error(error)
+  }
+}
 </script>
 
 <template>
@@ -43,10 +83,10 @@ const breadcrumb = [
       <div class="account-wrapper">
         <div class="columns">
           <!--Navigation-->
-          <div class="column is-8">
+          <div class="column is-12">
             <RouterView v-slot="{ Component }">
               <Transition name="translate-page-y" mode="in-out">
-                <component :is="Component" />
+                <component :is="Component" @submit="onSubmitEventHandler" />
               </Transition>
             </RouterView>
           </div>
@@ -57,7 +97,7 @@ const breadcrumb = [
 </template>
 
 <style lang="scss">
-@import '../../scss/abstracts/mixins';
+@import '../../../scss/abstracts/mixins';
 
 .is-navbar {
   .account-wrapper {
@@ -405,3 +445,5 @@ const breadcrumb = [
   }
 }
 </style>
+
+

@@ -55,6 +55,19 @@ const columns = {
   },
 } as const
 
+const breadcrumb = [
+  {
+    label: 'Settings',
+    icon: 'feather:settings',
+    to: {
+      name: 'settings',
+    },
+  },
+  {
+    label: 'User Defined Field List',
+  },
+]
+
 const paginate = async (page = 1) => {
   isLoading.value = true
 
@@ -200,6 +213,9 @@ watch(
           You can see pages content samples from 
           files in /src/components/pages directory
         -->
+
+      <VBreadcrumb :items="breadcrumb" separator="arrow" with-icons />
+
       <div class="list-flex-toolbar flex-list-v1">
         <VField>
           <VControl icon="feather:search">

@@ -199,10 +199,10 @@ const getUserProfile = async () => {
 }
 
 const getUserProfilePicture = () => {
-  return profile.value.profile_picture_url == undefined ||
-    profile.value.profile_picture_url == ''
-    ? 'https://via.placeholder.com/150x150'
-    : profile.value.profile_picture_url
+  const profilePicture =
+    profile.value.profile_picture_url || 'https://via.placeholder.com/150x150'
+
+  return profilePicture
 }
 
 onMounted(() => {

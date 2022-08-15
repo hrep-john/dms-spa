@@ -37,6 +37,7 @@
 
   .multiselect-dropdown {
     overflow: hidden;
+    background: var(--white);
   }
 
   .multiselect-clear {
@@ -107,6 +108,7 @@
     font-family: var(--font);
     font-size: 0.9rem;
     color: var(--dark-text);
+    background: var(--white);
   }
 
   .multiselect-options {

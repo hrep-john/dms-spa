@@ -37,12 +37,12 @@ useHead({
   title: `Update User - ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 
-const routeParams = router.currentRoute.value.params;
+const routeParams = router.currentRoute.value.params
 const service = userService.actions
 const isLoading = ref(false)
 const errors = ref({
   data: [],
-  show: false
+  show: false,
 })
 
 const breadcrumb = [
@@ -60,12 +60,16 @@ const breadcrumb = [
 
 const defaultValue = ref()
 
-const handleOnSubmit = async (data:any) => {
-  isLoading.value = true  
+const handleOnSubmit = async (data: any) => {
+  isLoading.value = true
+
+  if (!isLoading.value) {
+    return
+  }
 
   const payload = {
     id: routeParams.id,
-    ...data
+    ...data,
   }
 
   const response = await handleVuexApiCall(service.handleUpdateUser, payload)
@@ -86,7 +90,7 @@ onMounted(async () => {
 
   const response = await handleVuexApiCall(service.handleShowUser, routeParams.id)
 
-  isLoading.value = false;
+  isLoading.value = false
 
   if (response.success) {
     defaultValue.value = response.data.result
@@ -108,19 +112,16 @@ onMounted(async () => {
           You can see pages content samples from 
           files in /src/components/pages directory
         -->
-        <VBreadcrumb :items="breadcrumb" separator="arrow" with-icons />
+      <VBreadcrumb :items="breadcrumb" separator="arrow" with-icons />
 
-        <VProgress 
-          size="tiny" 
-          v-show="isLoading"
-        />
+      <VProgress size="tiny" v-show="isLoading" />
 
-        <UserFormLayout 
-          title="Update User"
-          @submit="handleOnSubmit" 
-          :loading="isLoading"
-          :default-value="defaultValue"
-        />
+      <UserFormLayout
+        title="Update User"
+        @submit="handleOnSubmit"
+        :loading="isLoading"
+        :default-value="defaultValue"
+      />
     </div>
   </SidebarLayout>
 </template>

@@ -66,3 +66,20 @@ SCSS Imports
 @import './layout/responsive';
 
 @import './abstracts/dark';
+
+
+.subsidebar-single-link {
+  height: 36px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: 24px;
+  margin: 0 auto;
+  font-family: "Montserrat", sans-serif;
+
+  a {
+    margin-left: 10px;
+    font-size: 14px;
+    color: var(--light-text);
+  }
+}

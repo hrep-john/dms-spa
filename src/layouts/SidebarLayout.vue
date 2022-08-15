@@ -161,6 +161,29 @@ watch(
             </template>
           </Tippy>
         </li>
+        <!-- <li v-if="isAdmin">
+          <Tippy placement="right">
+            <a
+              aria-label="Manage Reports"
+              :class="[activeMobileSubsidebar === 'reports' && 'is-active']"
+              tabindex="0"
+              @keydown.space.prevent="activeMobileSubsidebar = 'reports'"
+              @click="activeMobileSubsidebar = 'reports'"
+            >
+              <i aria-hidden="true" class="iconify" data-icon="bi:graph-up-arrow"></i>
+            </a>
+            <template #content>
+              <div class="v-popover-content is-text">
+                <div class="popover-head">
+                  <h4 class="dark-inverted">Reports</h4>
+                </div>
+                <div class="popover-body">
+                  <p>Manage Reports.</p>
+                </div>
+              </div>
+            </template>
+          </Tippy>
+        </li> -->
         <li v-if="isSuperadmin">
           <Tippy placement="right">
             <RouterLink :to="{ name: 'tenants' }">
@@ -190,6 +213,10 @@ watch(
       <KeepAlive>
         <DashboardsMobileSubsidebar
           v-if="isMobileSidebarOpen && activeMobileSubsidebar === 'dashboard'"
+        />
+        <ReportsMobileSubsidebar
+          v-else-if="isMobileSidebarOpen && activeMobileSubsidebar === 'reports'"
+          @close="isMobileSidebarOpen = false"
         />
       </KeepAlive>
     </Transition>
@@ -265,6 +292,34 @@ watch(
             </template>
           </Tippy>
         </li>
+        <!-- <li v-if="isAdmin">
+          <Tippy placement="right">
+            <a
+              :class="[activeMobileSubsidebar === 'reports' && 'is-active']"
+              data-content="Reports"
+              aria-label="Reports"
+              tabindex="0"
+              @keydown.space.prevent="switchSidebar('reports')"
+              @click="switchSidebar('reports')"
+            >
+              <i
+                aria-hidden="true"
+                class="iconify sidebar-svg"
+                data-icon="bi:graph-up-arrow"
+              ></i>
+            </a>
+            <template #content>
+              <div class="v-popover-content is-text">
+                <div class="popover-head">
+                  <h4 class="dark-inverted">Reports</h4>
+                </div>
+                <div class="popover-body">
+                  <p>Manage Reports.</p>
+                </div>
+              </div>
+            </template>
+          </Tippy>
+        </li> -->
         <li v-if="isSuperadmin">
           <Tippy placement="right">
             <RouterLink :to="{ name: 'tenants' }">
@@ -327,6 +382,10 @@ watch(
       <KeepAlive>
         <FilesSubsidebar
           v-if="isDesktopSidebarOpen && activeMobileSubsidebar === 'documents'"
+          @close="isDesktopSidebarOpen = false"
+        />
+        <ReportsSubsidebar
+          v-else-if="isDesktopSidebarOpen && activeMobileSubsidebar === 'reports'"
           @close="isDesktopSidebarOpen = false"
         />
       </KeepAlive>
