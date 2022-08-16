@@ -70,7 +70,7 @@ const themeClasses = computed(() => {
   margin-left: 0;
   height: 100vh;
   width: 80px;
-  background-color: var(--body-color);
+  background-color: var(--main-sidebar-background-color);
   box-shadow: none;
   z-index: 35;
   transition: border-radius 0.3s ease-in, background-color 0.3s ease-in, top 0.3s ease-in,
@@ -350,7 +350,7 @@ const themeClasses = computed(() => {
           .sidebar-svg {
             height: 20px;
             width: 20px;
-            color: var(--title-grey);
+            color: var(--main-sidebar-font-color);
             stroke-width: 1.6px;
             transition: all 0.3s; // transition-all test
           }

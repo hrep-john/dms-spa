@@ -130,7 +130,7 @@ watch(
       />
     </Transition>
 
-    <LanguagesPanel />
+    <!-- <LanguagesPanel /> -->
 
     <VViewWrapper>
       <VPageContentWrapper>
