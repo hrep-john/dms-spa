@@ -44,6 +44,7 @@
           raised
           fullwidth
           @click="handleLogout"
+          :loading="isLoading"
         >
           Logout
         </VButton>
@@ -68,7 +69,11 @@ const notyf = useNotyf()
 
 const handleLogout = async () => {
   if (!isLoading.value) {
+    isLoading.value = true
+
     const response = await handleVuexApiCall(service.handleLogout, null)
+
+    isLoading.value = false
 
     if (response.success) {
       userSession.logoutUser()
@@ -93,9 +98,9 @@ const userRole = computed(() => {
 })
 
 const getUserProfilePicture = () => {
-  return user.value.profile_picture_url == undefined ||
-    user.value.profile_picture_url == ''
-    ? 'https://via.placeholder.com/150x150'
-    : user.value.profile_picture_url
+  const profilePicture =
+    user.value.profile_picture_url || 'https://via.placeholder.com/150x150'
+
+  return profilePicture
 }
 </script>

@@ -26,13 +26,13 @@ const items = computed(() => {
                   <hr>
                   <p class="mt-4" v-if="item.features.length > 0">
                     <VTag color="primary" label="New Features" curved />
-                    <ul class="mt-2">
+                    <ul class="mt-4">
 											<li 
 												v-for="(feature, featureKey) in item.features" 
 												:key="featureKey"
-												class="ml-4 mt-3"
+												class="ml-5 mt-3 mb-3"
 											>
-												<h3>{{feature.subject}}</h3>
+												<h3 class="is-6 is-narrow subtitle">{{feature.subject}}</h3>
 												<p class="mt-1">{{feature.description}}</p>
                       </li>
 										</ul>
@@ -40,13 +40,13 @@ const items = computed(() => {
                   <p class="mt-4" v-if="item.enhancements.length > 0">
                     <hr>
                     <VTag color="info" label="Enhancements" curved />
-                    <ul class="mt-2">
+                    <ul class="mt-4">
 											<li 
 												v-for="(feature, featureKey) in item.enhancements" 
 												:key="featureKey"
-												class="ml-4 mt-3"
+												class="ml-5 mt-3 mb-3"
 											>
-												<h3>{{feature.subject}}</h3>
+												<h3 class="is-6 is-narrow subtitle">{{feature.subject}}</h3>
 												<p class="mt-1">{{feature.description}}</p>
                       </li>
 										</ul>
@@ -54,13 +54,13 @@ const items = computed(() => {
                   <p class="mt-4" v-if="item.bug_fixes.length > 0">
                     <hr>
                     <VTag color="danger" label="Bug Fixes" curved />
-                    <ul class="mt-2">
+                    <ul class="mt-4">
 											<li 
 												v-for="(feature, featureKey) in item.bug_fixes" 
 												:key="featureKey"
-												class="ml-4 mt-3"
+												class="ml-5 mt-3 mb-3"
 											>
-												<h3>{{feature.subject}}</h3>
+												<h3 class="is-6 is-narrow subtitle">{{feature.subject}}</h3>
 												<p class="mt-1">{{feature.description}}</p>
                       </li>
 										</ul>

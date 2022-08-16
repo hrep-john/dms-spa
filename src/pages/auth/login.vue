@@ -104,9 +104,11 @@ const getTenantSettings = async () => {
   )
 
   if (response.success) {
+    tenantSettings.setTenantSettings(response.data.results)
+
     setTimeout(() => {
       tenantSettings.setIsMounted(true)
-    }, 500)
+    }, 1500)
   } else {
     const error = response?.body?.message
     notyf.error(error)
@@ -131,23 +133,42 @@ useHead({
   <VLoader size="xl" v-show="isPreloading" :active="true" class="h-screen" />
   <div v-show="!isPreloading" class="auth-wrapper-inner columns is-gapless">
     <!-- Image section (hidden on mobile) -->
-    <div class="column login-column is-8 h-hidden-mobile h-hidden-tablet-p hero-banner">
+    <div
+      class="
+        column
+        login-column
+        is-8
+        h-hidden-mobile h-hidden-tablet-p
+        hero-banner
+        left-section
+      "
+    >
       <div class="hero login-hero is-fullheight is-app-grey">
         <div class="hero-body">
-          <VFlex flex-direction="column" class="columns mx-auto">
-            <div class="is-10 is-offset-1 p-l-20 p-r-20">
+          <div class="columns">
+            <div class="column is-12">
               <img
                 class="light-image"
-                src="/@src/assets/illustrations/login/background-light.svg?format=webp"
+                :src="
+                  tenantSettings.getTenantSettings(
+                    'login-placeholder-image',
+                    '/@src/assets/illustrations/login/background-dark.svg?format=webp'
+                  )
+                "
                 alt=""
               />
               <img
                 class="dark-image"
-                src="/@src/assets/illustrations/login/background-dark.svg?format=webp"
+                :src="
+                  tenantSettings.getTenantSettings(
+                    'login-placeholder-image',
+                    '/@src/assets/illustrations/login/background-dark.svg?format=webp'
+                  )
+                "
                 alt=""
               />
             </div>
-          </VFlex>
+          </div>
         </div>
         <div class="hero-footer">
           <p class="has-text-centered"></p>
@@ -157,7 +178,7 @@ useHead({
 
     <!-- Form section -->
     <div class="column">
-      <div class="hero is-fullheight is-white">
+      <div class="hero is-fullheight is-white right-section">
         <div class="hero-heading">
           <label
             class="dark-mode ml-auto"
@@ -291,5 +312,23 @@ useHead({
 <style lang="scss" scoped>
 .h-screen {
   height: 100vh;
+}
+
+.left-section {
+  background: var(--login-left-section-background-color) !important;
+}
+
+.right-section {
+  background: var(--login-right-section-background-color) !important;
+}
+
+.is-dark {
+  .left-section {
+    background: var(--dark-sidebar-light-4) !important;
+  }
+
+  .right-section {
+    background: var(--dark-sidebar-dark-4) !important;
+  }
 }
 </style>

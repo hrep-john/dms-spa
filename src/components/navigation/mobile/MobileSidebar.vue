@@ -95,7 +95,7 @@ const props = defineProps<{
 
           > i,
           svg {
-            color: var(--title-grey);
+            color: var(--main-sidebar-font-color);
             height: 20px;
             width: 20px;
             stroke-width: 1.6px;
