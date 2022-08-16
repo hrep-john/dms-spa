@@ -136,6 +136,11 @@ const getConfigItems = () => {
           key: '--main-sidebar-background-color',
           data: getConfigItem('--main-sidebar-background-color'),
         },
+        {
+          type: 'image-upload',
+          key: 'tenant-logo',
+          data: getConfigItem('tenant-logo'),
+        },
       ],
     },
     {
