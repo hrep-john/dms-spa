@@ -284,7 +284,7 @@ onMounted(async () => {
           <div :class="[isStuck && 'is-stuck']" class="form-header stuck-header">
             <div class="form-header-inner">
               <div class="left">
-                <h3>Document No: {{ details.id }}</h3>
+                <h3>Series ID: {{ details.series_id }}</h3>
               </div>
               <div class="right">
                 <div class="buttons">
