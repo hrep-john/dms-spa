@@ -29,6 +29,9 @@ const getItemDescription = (item: { event: ''; filename: '' }) => {
     case EventEnum.Deleted:
       description = ` Deleted a file (${item.filename}).`
       break
+    case EventEnum.Downloaded:
+      description = ` Downloaded this file (${item.filename}).`
+      break
   }
 
   return description
