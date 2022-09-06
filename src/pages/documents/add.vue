@@ -85,9 +85,7 @@ const uploadedDocuments = ref([])
 const handleOnProcessDocument = (error: any, file: any) => {
   if (error) {
     notyf.error(`Unable to upload file (${file.filename})`)
-    console.log('error = '.file.filename)
 
-    console.log(error)
     return false
   }
 
