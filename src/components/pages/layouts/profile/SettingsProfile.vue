@@ -56,7 +56,11 @@ const isAdmin = computed(() => {
 
     <div class="profile-body mt-4">
       <div class="settings-section">
-        <a v-if="isAdmin" class="settings-box is-disabled">
+        <RouterLink
+          :to="{ name: 'settings-tenant-settings-edit' }"
+          v-if="isAdmin"
+          class="settings-box"
+        >
           <div class="edit-icon">
             <i aria-hidden="true" class="lnil lnil-pencil"></i>
           </div>
@@ -65,7 +69,7 @@ const isAdmin = computed(() => {
 
           <span>Tenant</span>
           <h3>Tenant Settings</h3>
-        </a>
+        </RouterLink>
         <RouterLink
           :to="{ name: 'settings-customization-edit' }"
           v-if="isAdmin"

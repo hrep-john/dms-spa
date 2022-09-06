@@ -223,7 +223,8 @@ const handleOnPreviewDocument = (id: number) => {
 }
 
 const getDocumentFileName = (id: number) => {
-  return datagrid.value.data.find((item) => item.id === id).filename
+  const item = datagrid.value.data.find((item) => item.id === id)
+  return item.filename || ''
 }
 
 const handleOnDeleteDocument = (id: number) => {
