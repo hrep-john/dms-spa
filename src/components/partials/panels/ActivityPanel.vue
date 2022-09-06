@@ -184,7 +184,6 @@ const activeTab = ref<TabId>('team')
                   <div class="avatar-stack">
                     <VAvatar size="small" picture="https://via.placeholder.com/64" />
                     <VAvatar size="small" picture="https://via.placeholder.com/64" />
-                    <VAvatar size="small" picture="/images/avatars/svg/vuero-1.svg" />
                   </div>
                 </div>
               </div>

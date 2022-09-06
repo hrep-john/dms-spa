@@ -48,6 +48,7 @@ declare module 'vue' {
     StackPopoverContent: typeof import('./src/components/partials/popover/StackPopoverContent.vue')['default']
     SVGErrorPlaceholder: typeof import('./src/components/svg/SVGErrorPlaceholder.vue')['default']
     TenantFormLayout: typeof import('./src/components/pages/forms/form-layout/TenantFormLayout.vue')['default']
+    TenantSettingsFormLayout: typeof import('./src/components/pages/forms/form-layout/TenantSettingsFormLayout.vue')['default']
     Toolbar: typeof import('./src/components/partials/toolbars/Toolbar.vue')['default']
     UdfFormLayout: typeof import('./src/components/pages/forms/form-layout/UdfFormLayout.vue')['default']
     UIWidget: typeof import('./src/components/partials/widgets/ui-creative/UIWidget.vue')['default']
