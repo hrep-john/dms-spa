@@ -71,6 +71,7 @@ const onSubmit = handleSubmit(async (values) => {
   if (response.success) {
     userSession.setToken(response.data.access_token)
     userSession.setRoles(response.data.roles)
+    userSession.setPermissions(response.data.permissions)
     userSession.setUser(response.data.user)
 
     notyf.dismissAll()
@@ -125,7 +126,7 @@ onMounted(async () => {
 })
 
 useHead({
-  title: `Login - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `Login | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 </script>
 

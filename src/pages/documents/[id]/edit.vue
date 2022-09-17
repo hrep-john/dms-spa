@@ -1,3 +1,9 @@
+<route lang="yaml">
+meta:
+  permissionsAllowed:
+    - 'Document: Edit'
+</route>
+
 <script setup lang="ts">
 /**
  * This is a Vue Component that will be
@@ -28,7 +34,7 @@ const viewWrapper = useViewWrapper()
 viewWrapper.setPageTitle('Edit Details')
 
 useHead({
-  title: `Edit Details - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `Edit Details | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 
 const routeParams = router.currentRoute.value.params

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { doesUserCan } from '/@src/utils/helper'
 
 const props = defineProps({
   document: {
@@ -35,17 +36,27 @@ watch(
 <template>
   <VDropdown icon="feather:more-vertical" spaced right ref="dropdown">
     <template #content>
-      <a role="menuitem" @click="emitEvent('view')" class="dropdown-item is-media">
+      <a
+        v-if="doesUserCan('Document: Preview')"
+        role="menuitem"
+        @click="emitEvent('view')"
+        class="dropdown-item is-media"
+      >
         <div class="icon">
           <i aria-hidden="true" class="fas fa-eye"></i>
         </div>
         <div class="meta">
-          <span>View</span>
-          <span>View this document</span>
+          <span>Preview</span>
+          <span>Preview this document</span>
         </div>
       </a>
-      <hr class="dropdown-divider" />
-      <a role="menuitem" @click="emitEvent('edit')" class="dropdown-item is-media">
+      <hr v-if="doesUserCan('Document: Preview')" class="dropdown-divider" />
+      <a
+        v-if="doesUserCan('Document: Edit')"
+        role="menuitem"
+        @click="emitEvent('edit')"
+        class="dropdown-item is-media"
+      >
         <div class="icon">
           <i aria-hidden="true" class="fas fa-edit"></i>
         </div>
@@ -54,8 +65,13 @@ watch(
           <span>Edit document details</span>
         </div>
       </a>
-      <hr class="dropdown-divider" />
-      <a role="menuitem" @click="emitEvent('download')" class="dropdown-item is-media">
+      <hr v-if="doesUserCan('Document: Edit')" class="dropdown-divider" />
+      <a
+        v-if="doesUserCan('Document: Download')"
+        role="menuitem"
+        @click="emitEvent('download')"
+        class="dropdown-item is-media"
+      >
         <div class="icon">
           <i aria-hidden="true" class="fas fa-download"></i>
         </div>
@@ -64,8 +80,13 @@ watch(
           <span>Download this document</span>
         </div>
       </a>
-      <hr class="dropdown-divider" />
-      <a role="menuitem" @click="emitEvent('delete')" class="dropdown-item is-media">
+      <hr v-if="doesUserCan('Document: Download')" class="dropdown-divider" />
+      <a
+        v-if="doesUserCan('Document: Delete')"
+        role="menuitem"
+        @click="emitEvent('delete')"
+        class="dropdown-item is-media"
+      >
         <div class="icon">
           <i aria-hidden="true" class="fas fa-trash"></i>
         </div>

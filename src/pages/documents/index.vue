@@ -1,3 +1,9 @@
+<route lang="yaml">
+meta:
+  permissionsAllowed:
+    - 'Document: View List'
+</route>
+
 <script setup lang="ts">
 /**
  * This is a Vue Component that will be
@@ -22,11 +28,15 @@ import documentServices from '/@src/stores/documents'
 import udfServices from '/@src/stores/udfs'
 import ModuleEnum from '/@src/enums/module'
 import UdfEnum from '/@src/enums/udf'
-import { handleVuexApiCall, createTempDownloadBtnLink } from '/@src/utils/helper'
+import {
+  handleVuexApiCall,
+  createTempDownloadBtnLink,
+  doesUserCan,
+} from '/@src/utils/helper'
 import { useUserSession } from '/@src/stores/userSession'
 
 useHead({
-  title: `Document List - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `Document List | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 
 const userSession = useUserSession()
@@ -519,7 +529,7 @@ watch(
             </template>
           </Tippy>
 
-          <Tippy placement="top">
+          <Tippy placement="top" v-if="doesUserCan('Document: Delete')">
             <VIconBox
               class="radius-25 mr-1"
               color="primary-grey"

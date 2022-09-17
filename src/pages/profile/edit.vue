@@ -18,7 +18,7 @@ const viewWrapper = useViewWrapper()
 viewWrapper.setPageTitle('View Profile')
 
 useHead({
-  title: `View Profile - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `View Profile | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 
 const breadcrumb = [

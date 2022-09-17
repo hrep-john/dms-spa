@@ -129,7 +129,7 @@ onMounted(() => {
 })
 
 useHead({
-  title: `Reset Password - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `Reset Password | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 </script>
 

@@ -115,7 +115,7 @@ watch(
 
     <div class="right-panel">
       <div class="right-panel-head">
-        <h3>View Document</h3>
+        <h3>Preview Document</h3>
         <a
           class="close-panel"
           tabindex="0"

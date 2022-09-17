@@ -75,7 +75,7 @@ const onSubmit = handleSubmit(async (values) => {
 })
 
 useHead({
-  title: `Forgot Password - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `Forgot Password | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 </script>
 

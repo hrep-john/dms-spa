@@ -6,6 +6,7 @@ import type { SidebarTheme } from '/@src/components/navigation/desktop/Sidebar.v
 import { usePanels } from '/@src/stores/panels'
 import { useViewWrapper } from '/@src/stores/viewWrapper'
 import { useUserSession } from '/@src/stores/userSession'
+import { doesUserCan } from '../utils/helper'
 
 const props = withDefaults(
   defineProps<{
@@ -248,7 +249,7 @@ watch(
             </template>
           </Tippy>
         </li>
-        <li>
+        <li v-if="doesUserCan('Document: View List')">
           <Tippy placement="right">
             <RouterLink :to="{ name: 'documents' }">
               <i
@@ -270,7 +271,7 @@ watch(
             </template>
           </Tippy>
         </li>
-        <li v-if="isAdmin">
+        <li v-if="isAdmin && doesUserCan('User: View List')">
           <Tippy placement="right">
             <RouterLink :to="{ name: 'users' }">
               <i
@@ -287,6 +288,27 @@ watch(
                 </div>
                 <div class="popover-body">
                   <p>Manage Users.</p>
+                </div>
+              </div>
+            </template>
+          </Tippy>
+        </li>
+        <li v-if="isAdmin && doesUserCan('Role: View List')">
+          <Tippy placement="right">
+            <RouterLink :to="{ name: 'roles' }">
+              <i
+                aria-hidden="true"
+                class="fas fa-user-cog iconify sidebar-svg"
+                @click="activeMobileSubsidebar = 'roles'"
+              ></i>
+            </RouterLink>
+            <template #content>
+              <div class="v-popover-content is-text">
+                <div class="popover-head">
+                  <h4 class="dark-inverted">Roles</h4>
+                </div>
+                <div class="popover-body">
+                  <p>Manage Roles.</p>
                 </div>
               </div>
             </template>
@@ -320,7 +342,7 @@ watch(
             </template>
           </Tippy>
         </li> -->
-        <li v-if="isSuperadmin">
+        <li v-if="isSuperadmin && doesUserCan('Tenant: View List')">
           <Tippy placement="right">
             <RouterLink :to="{ name: 'tenants' }">
               <i

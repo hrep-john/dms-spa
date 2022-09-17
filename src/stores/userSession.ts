@@ -9,6 +9,7 @@ export const useUserSession = defineStore('userSession', () => {
   // @see https://vueuse.org/core/usestorage/
   const token = useStorage('token', '')
   const roles = useStorage('roles', '')
+  const permissions = useStorage('permissions', '')
 
   const user = useStorage('user', '')
   const loading = ref(true)
@@ -27,6 +28,10 @@ export const useUserSession = defineStore('userSession', () => {
     roles.value = JSON.stringify(newRoles)
   }
 
+  function setPermissions(newPermissions: string) {
+    permissions.value = JSON.stringify(newPermissions)
+  }
+
   function setLoading(newLoading: boolean) {
     loading.value = newLoading
   }
@@ -34,18 +39,21 @@ export const useUserSession = defineStore('userSession', () => {
   async function logoutUser() {
     token.value = undefined
     roles.value = undefined
+    permissions.value = undefined
     user.value = undefined
   }
 
   return {
     user,
     roles,
+    permissions,
     token,
     isLoggedIn,
     loading,
     logoutUser,
     setUser,
     setRoles,
+    setPermissions,
     setToken,
     setLoading,
   } as const

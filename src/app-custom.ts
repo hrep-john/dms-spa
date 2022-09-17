@@ -99,6 +99,7 @@ export function registerRouterNavigationGuards({ router, api }: VueroAppContext)
         const { data: response } = await api.get('/api/profile/me')
         userSession.setUser(response.user)
         userSession.setRoles(response.roles)
+        userSession.setPermissions(response.permissions)
         notyf.success(
           `Welcome back, ${response.user.first_name} ${response.user.last_name}`
         )

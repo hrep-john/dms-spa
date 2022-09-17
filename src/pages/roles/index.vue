@@ -2,6 +2,9 @@
 meta:
   rolesAllowed:
     - Superadmin
+    - Admin
+  permissionsAllowed:
+    - 'Role: View List'
 </route>
 
 <script setup lang="ts">
@@ -21,21 +24,21 @@ import { useHead } from '@vueuse/head'
 import { useViewWrapper } from '/@src/stores/viewWrapper'
 import { onMounted, ref, computed, watch } from 'vue'
 import { useNotyf } from '/@src/composable/useNotyf'
-import tenantService from '/@src/stores/tenants'
+import roleService from '/@src/stores/roles'
 import debounce from 'lodash.debounce'
 import { useRouter } from 'vue-router'
 import { handleVuexApiCall, doesUserCan } from '/@src/utils/helper'
 
 useHead({
-  title: `Tenant List | ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `Role List | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 
 const router = useRouter()
 const notyf = useNotyf()
 const viewWrapper = useViewWrapper()
-viewWrapper.setPageTitle('Tenant List')
+viewWrapper.setPageTitle('Role List')
 
-const service = tenantService.actions
+const service = roleService.actions
 
 const isLoading = ref(true)
 const search = ref('')
@@ -44,10 +47,10 @@ const page = ref(1)
 const deleteConfirm = ref({ visible: false, selected: 0 })
 
 const columns = {
-  domain: 'Domain',
   name: 'Name',
-  created_at: 'Date Created',
+  total_permissions: 'Total Permissions',
   updated_at: 'Last Updated',
+  updated_by: 'Updated By',
   actions: {
     label: 'Actions',
     align: 'end',
@@ -63,9 +66,7 @@ const paginate = async (page = 1) => {
     filters: buildFilters(),
   }
 
-  const response = await handleVuexApiCall(service.handleGetTenants, payload)
-
-  isLoading.value = false
+  const response = await handleVuexApiCall(service.handleGetRoles, payload)
 
   if (response.success) {
     const formatted = formatData(response.data.results.data)
@@ -75,10 +76,12 @@ const paginate = async (page = 1) => {
     const error = response?.body?.message
     notyf.error(error)
   }
+
+  isLoading.value = false
 }
 
 const buildFilters = () => {
-  const columns = ['domain', 'name']
+  const columns = ['name', 'updated_at']
   const filters = Array()
 
   columns.forEach((column) => {
@@ -96,37 +99,25 @@ const buildFilters = () => {
 }
 
 function formatData(data: any) {
-  let formatted = []
-
-  for (let i = 0; i < data.length; i++) {
-    formatted.push({
-      id: data[i].id,
-      domain: data[i].domain,
-      name: data[i].name,
-      created_at: data[i].created_at,
-      updated_at: data[i].updated_at,
-    })
-  }
-
-  return formatted
+  return data
 }
 
-const searchRecords = debounce(() => {
-  clearRecords()
-  paginate()
+const searchRecords = debounce(async () => {
+  await clearRecords()
+  await paginate()
 }, 500)
 
-const clearRecords = () => {
+const clearRecords = async () => {
   datatable.value.data = []
   datatable.value.meta = {}
   page.value = 1
 }
 
-const updateRecord = (id: any) => {
-  router.push(`/tenants/${id}/edit`)
+const onHandleUpdateRecord = (id: any) => {
+  router.push(`/roles/${id}/edit`)
 }
 
-const deleteRecord = (id: any) => {
+const onHandleDeleteRecord = (id: any) => {
   deleteConfirm.value.visible = true
   deleteConfirm.value.selected = id
 }
@@ -139,8 +130,8 @@ const isLastPage = computed(() => {
   return datatable.value.meta.current_page >= datatable.value.meta.last_page
 })
 
-const loadMore = () => {
-  paginate(++page.value)
+const loadMore = async () => {
+  await paginate(++page.value)
 }
 
 const getSelectedRow = (id: any) => {
@@ -153,9 +144,9 @@ const getSelectedRow = (id: any) => {
   return row?.name
 }
 
-const handleOnDeletedRecord = async (close: Function) => {
+const handleOnDeletedRecord = async (close) => {
   const response = await handleVuexApiCall(
-    service.handleDeleteTenant,
+    service.handleDeleteRole,
     deleteConfirm.value.selected
   )
 
@@ -173,10 +164,8 @@ const handleOnDeletedRecord = async (close: Function) => {
   close()
 }
 
-onMounted(() => {
-  setTimeout(function () {
-    paginate()
-  }, 200)
+onMounted(async () => {
+  await paginate()
 })
 
 watch(
@@ -209,20 +198,20 @@ watch(
         </VField>
 
         <VButtons>
-          <RouterLink :to="{ name: 'tenants-add' }">
-            <VButton color="primary" icon="fas fa-plus"> Add Tenant </VButton>
+          <RouterLink :to="{ name: 'roles-add' }">
+            <VButton color="primary" icon="fas fa-plus"> Add Role </VButton>
           </RouterLink>
         </VButtons>
       </div>
 
       <FlexListV1
-        :with-edit="doesUserCan('Tenant: Edit Tenant')"
-        :with-delete="doesUserCan('Tenant: Delete Tenant')"
+        :with-edit="doesUserCan('Role: Edit Role')"
+        :with-delete="doesUserCan('Role: Delete Role')"
         :is-loading="isLoading"
         :datatable="datatable"
         :columns="columns"
-        @update="updateRecord"
-        @delete="deleteRecord"
+        @update="onHandleUpdateRecord"
+        @delete="onHandleDeleteRecord"
         @paginate="paginate"
       />
 

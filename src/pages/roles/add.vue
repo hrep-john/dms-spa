@@ -1,10 +1,10 @@
 <route lang="yaml">
 meta:
-  rolesAllowed: 
+  rolesAllowed:
     - Superadmin
     - Admin
   permissionsAllowed:
-    - 'User: Edit User'
+    - 'Role: Create'
 </route>
 
 <script setup lang="ts">
@@ -22,86 +22,55 @@ meta:
 
 import { useHead } from '@vueuse/head'
 import { useViewWrapper } from '/@src/stores/viewWrapper'
-import { ref, onMounted } from 'vue'
-import { useUserSession } from '/@src/stores/userSession'
+import { ref } from 'vue'
 import { useNotyf } from '/@src/composable/useNotyf'
-import userService from '/@src/stores/users'
+import roleService from '/@src/stores/roles'
 import { useRouter } from 'vue-router'
 import { handleVuexApiCall } from '/@src/utils/helper'
 
 const router = useRouter()
 const notyf = useNotyf()
-const userSession = useUserSession()
 const viewWrapper = useViewWrapper()
-viewWrapper.setPageTitle('Edit User')
+viewWrapper.setPageTitle('Add Role')
 
 useHead({
-  title: `Edit User | ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `Add Role | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 
-const routeParams = router.currentRoute.value.params
-const service = userService.actions
+const service = roleService.actions
 const isLoading = ref(false)
-const errors = ref({
-  data: [],
-  show: false,
-})
 
 const breadcrumb = [
   {
-    label: 'User List',
-    icon: 'feather:user',
+    label: 'Role List',
+    icon: 'feather:role',
     to: {
-      name: 'users',
+      name: 'roles',
     },
   },
   {
-    label: 'Edit User',
+    label: 'Add Role',
   },
 ]
 
-const defaultValue = ref()
-
 const handleOnSubmit = async (data: any) => {
-  isLoading.value = true
-
-  if (!isLoading.value) {
-    return
-  }
-
-  const payload = {
-    id: routeParams.id,
-    ...data,
-  }
-
-  const response = await handleVuexApiCall(service.handleUpdateUser, payload)
+  const response = await handleVuexApiCall(service.handleStoreRole, data)
 
   isLoading.value = false
 
   if (response.success) {
-    notyf.success(response.data.message)
-    router.push({ name: 'users' })
+    notyf.success(response.data)
+    router.push({ name: 'roles' })
   } else {
-    const error = response?.body?.message
-    notyf.error(error)
+    const errors = response?.body?.errors
+
+    for (let key of Object.keys(errors)) {
+      errors[key].forEach((error) => {
+        notyf.error(error)
+      })
+    }
   }
 }
-
-onMounted(async () => {
-  isLoading.value = true
-
-  const response = await handleVuexApiCall(service.handleShowUser, routeParams.id)
-
-  isLoading.value = false
-
-  if (response.success) {
-    defaultValue.value = response.data.result
-  } else {
-    const error = response?.body?.message
-    notyf.error(error)
-    router.push({ name: 'users' })
-  }
-})
 </script>
 
 <template>
@@ -118,11 +87,12 @@ onMounted(async () => {
 
       <VProgress size="tiny" v-show="isLoading" />
 
-      <UserFormLayout
-        title="Edit User"
+      <RoleFormLayout
         @submit="handleOnSubmit"
+        :errors="errors"
         :loading="isLoading"
-        :default-value="defaultValue"
+        :is-new="true"
+        title="Add a Role"
       />
     </div>
   </SidebarLayout>

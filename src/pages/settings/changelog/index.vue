@@ -1,3 +1,9 @@
+<route lang="yaml">
+meta:
+  permissionsAllowed:
+    - 'Settings: View Changelogs'
+</route>
+
 <script setup lang="ts">
 /**
  * This is a Vue Component that will be
@@ -18,7 +24,7 @@ const viewWrapper = useViewWrapper()
 viewWrapper.setPageTitle('Changelog')
 
 useHead({
-  title: `Changelog - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `Changelog | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 
 const breadcrumb = [
