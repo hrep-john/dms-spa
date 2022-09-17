@@ -221,7 +221,7 @@ watch(
 
         <VButtons>
           <RouterLink :to="{ name: 'users-add' }">
-            <VButton color="primary" icon="fas fa-plus" elevated> Add User </VButton>
+            <VButton color="primary" icon="fas fa-plus"> Add User </VButton>
           </RouterLink>
         </VButtons>
       </div>

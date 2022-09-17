@@ -229,7 +229,7 @@ watch(
 
         <VButtons>
           <RouterLink :to="{ name: 'settings-udfs-add' }">
-            <VButton color="primary" icon="fas fa-plus" elevated> Add UDF </VButton>
+            <VButton color="primary" icon="fas fa-plus"> Add UDF </VButton>
           </RouterLink>
         </VButtons>
       </div>

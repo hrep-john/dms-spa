@@ -210,7 +210,7 @@ watch(
 
         <VButtons>
           <RouterLink :to="{ name: 'tenants-add' }">
-            <VButton color="primary" icon="fas fa-plus" elevated> Add Tenant </VButton>
+            <VButton color="primary" icon="fas fa-plus"> Add Tenant </VButton>
           </RouterLink>
         </VButtons>
       </div>
