@@ -27,6 +27,8 @@
     "new_password": "New Password",
     "tenant_name": "Tenant Name",
     "password": "Password",
+    "permission": "Permission",
+    "permissions": "Permissions",
     "record_info": "Record Info",
     "region": "Region",
     "reset_password": "Reset Password",
@@ -86,6 +88,9 @@
       "required_login": "Enter your password with at least 6 characters, it will be required to login",
       "minimum": "The password should contains at least 6 characters"
     },
+    "permission": {
+      "required": "Permission is required"
+    },
     "role": {
       "required": "Role is required"
     },
@@ -120,8 +125,9 @@
     "please_login_to_your_account": "Please log in to your account",
     "reset_account_password": "Reset your account password",
     "select_your_gender": "Select your gender",
-    "select_your_tenant": "Select your tenant",
+    "select_your_permissions": "Select your permissions",
     "select_your_roles": "Select your roles",
+    "select_your_tenant": "Select your tenant",
     "your_indentity_has_been_identified": "Your identity has been verified!"
   },
   "error": {

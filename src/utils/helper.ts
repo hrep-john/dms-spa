@@ -66,3 +66,9 @@ export const createTempDownloadBtnLink = (url: string) => {
   link.click()
   link.remove()
 }
+
+export const doesUserCan = (permission: string) => {
+  const permissions = JSON.parse(userSession.permissions)
+
+  return permissions.includes(permission)
+}

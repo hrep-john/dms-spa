@@ -4,7 +4,7 @@ meta:
     - Superadmin
     - Admin
   permissionsAllowed:
-    - 'User: Edit User'
+    - 'Role: Edit User'
 </route>
 
 <script setup lang="ts">
@@ -25,7 +25,7 @@ import { useViewWrapper } from '/@src/stores/viewWrapper'
 import { ref, onMounted } from 'vue'
 import { useUserSession } from '/@src/stores/userSession'
 import { useNotyf } from '/@src/composable/useNotyf'
-import userService from '/@src/stores/users'
+import roleService from '/@src/stores/roles'
 import { useRouter } from 'vue-router'
 import { handleVuexApiCall } from '/@src/utils/helper'
 
@@ -33,14 +33,14 @@ const router = useRouter()
 const notyf = useNotyf()
 const userSession = useUserSession()
 const viewWrapper = useViewWrapper()
-viewWrapper.setPageTitle('Edit User')
+viewWrapper.setPageTitle('Edit Role')
 
 useHead({
-  title: `Edit User | ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `Edit Role | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 
 const routeParams = router.currentRoute.value.params
-const service = userService.actions
+const service = roleService.actions
 const isLoading = ref(false)
 const errors = ref({
   data: [],
@@ -49,14 +49,14 @@ const errors = ref({
 
 const breadcrumb = [
   {
-    label: 'User List',
-    icon: 'feather:user',
+    label: 'Role List',
+    icon: 'feather:role',
     to: {
-      name: 'users',
+      name: 'roles',
     },
   },
   {
-    label: 'Edit User',
+    label: 'Edit Role',
   },
 ]
 
@@ -74,13 +74,13 @@ const handleOnSubmit = async (data: any) => {
     ...data,
   }
 
-  const response = await handleVuexApiCall(service.handleUpdateUser, payload)
+  const response = await handleVuexApiCall(service.handleUpdateRole, payload)
 
   isLoading.value = false
 
   if (response.success) {
     notyf.success(response.data.message)
-    router.push({ name: 'users' })
+    router.push({ name: 'roles' })
   } else {
     const error = response?.body?.message
     notyf.error(error)
@@ -90,7 +90,7 @@ const handleOnSubmit = async (data: any) => {
 onMounted(async () => {
   isLoading.value = true
 
-  const response = await handleVuexApiCall(service.handleShowUser, routeParams.id)
+  const response = await handleVuexApiCall(service.handleShowRole, routeParams.id)
 
   isLoading.value = false
 
@@ -99,7 +99,7 @@ onMounted(async () => {
   } else {
     const error = response?.body?.message
     notyf.error(error)
-    router.push({ name: 'users' })
+    router.push({ name: 'roles' })
   }
 })
 </script>
@@ -118,8 +118,8 @@ onMounted(async () => {
 
       <VProgress size="tiny" v-show="isLoading" />
 
-      <UserFormLayout
-        title="Edit User"
+      <RoleFormLayout
+        title="Edit Role"
         @submit="handleOnSubmit"
         :loading="isLoading"
         :default-value="defaultValue"

@@ -7,7 +7,7 @@ import { useNotyf } from '/@src/composable/useNotyf'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useTenantSettings } from '/@src/stores/tenantSettings'
-import { handleVuexApiCall } from '/@src/utils/helper'
+import { handleVuexApiCall, doesUserCan } from '/@src/utils/helper'
 import tenantSettingsService from '/@src/stores/tenantSettings'
 
 const emit = defineEmits(['submit', 'uploadfile'])
@@ -161,6 +161,7 @@ onBeforeUnmount(() => {
                 color="primary"
                 raised
                 :loading="isLoading"
+                :disabled="!doesUserCan('Settings: Edit Tenant Settings')"
                 tabindex="0"
                 @keydown.space.prevent="onSubmit"
                 @click="onSubmit"

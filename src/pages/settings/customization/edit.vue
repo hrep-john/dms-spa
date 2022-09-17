@@ -1,8 +1,10 @@
 <route lang="yaml">
 meta:
   rolesAllowed: 
-    - superadmin
-    - admin
+    - Superadmin
+    - Admin
+  permissionsAllowed:
+    - 'Settings: View Tenant Customization'
 </route>
 
 <script setup lang="ts">
@@ -37,7 +39,7 @@ viewWrapper.setPageTitle('Customization')
 const isLoading = ref(false)
 
 useHead({
-  title: `Customization - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `Customization | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 
 const onSubmitEventHandler = async (data: any) => {

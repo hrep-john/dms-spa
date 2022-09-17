@@ -1,8 +1,10 @@
 <route lang="yaml">
 meta:
   rolesAllowed:
-    - superadmin
-    - admin
+    - Superadmin
+    - Admin
+  permissionsAllowed:
+    - 'User: View List'
 </route>
 
 <script setup lang="ts">
@@ -25,10 +27,10 @@ import { useNotyf } from '/@src/composable/useNotyf'
 import userService from '/@src/stores/users'
 import debounce from 'lodash.debounce'
 import { useRouter } from 'vue-router'
-import { handleVuexApiCall } from '/@src/utils/helper'
+import { handleVuexApiCall, doesUserCan } from '/@src/utils/helper'
 
 useHead({
-  title: `User List - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `User List | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 
 const router = useRouter()
@@ -221,12 +223,14 @@ watch(
 
         <VButtons>
           <RouterLink :to="{ name: 'users-add' }">
-            <VButton color="primary" icon="fas fa-plus" elevated> Add User </VButton>
+            <VButton color="primary" icon="fas fa-plus"> Add User </VButton>
           </RouterLink>
         </VButtons>
       </div>
 
       <FlexListV1
+        :with-edit="doesUserCan('User: Edit User')"
+        :with-delete="doesUserCan('User: Delete User')"
         :is-loading="isLoading"
         :datatable="datatable"
         :columns="columns"

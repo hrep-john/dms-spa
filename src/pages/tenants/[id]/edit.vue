@@ -1,7 +1,7 @@
 <route lang="yaml">
 meta:
   rolesAllowed: 
-    - superadmin
+    - Superadmin
 </route>
 
 <script setup lang="ts">
@@ -27,18 +27,18 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const notyf = useNotyf()
 const viewWrapper = useViewWrapper()
-viewWrapper.setPageTitle('Update Tenant')
+viewWrapper.setPageTitle('Edit Tenant')
 
 useHead({
-  title: `Update Tenant - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `Edit Tenant | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 
-const routeParams = router.currentRoute.value.params;
+const routeParams = router.currentRoute.value.params
 const service = tenantService.actions
 const isLoading = ref(false)
 const errors = ref({
   data: [],
-  show: false
+  show: false,
 })
 
 const breadcrumb = [
@@ -50,58 +50,60 @@ const breadcrumb = [
     },
   },
   {
-    label: 'Update Tenant',
+    label: 'Edit Tenant',
   },
 ]
 
 const defaultValue = ref()
 
-const formatErrors = (errors:any) => {
-  const errorLists = [];
+const formatErrors = (errors: any) => {
+  const errorLists = []
 
   for (let item in errors) {
-    for(let i=0; i<errors[item].length; i++) {
-      errorLists.push(errors[item][i]);
+    for (let i = 0; i < errors[item].length; i++) {
+      errorLists.push(errors[item][i])
     }
   }
 
-  return errorLists;
+  return errorLists
 }
 
-const handleOnSubmit = async (data:any) => {
+const handleOnSubmit = async (data: any) => {
   errors.value.data = []
   isLoading.value = true
 
   const payload = data
   payload.tenant_id = routeParams.id
 
-  service.handleUpdateTenant(payload, routeParams.id)
-  .then(response => {
-    isLoading.value = false;
-    notyf.success(response)
-    router.push({ name: 'tenants' })
-  })
-  .catch(error => {
-    notyf.error(error.response.data.message)
-    errors.value.show = true
-    errors.value.data = formatErrors(error.response.data.errors)
-    isLoading.value = false;
-  })
+  service
+    .handleUpdateTenant(payload, routeParams.id)
+    .then((response) => {
+      isLoading.value = false
+      notyf.success(response)
+      router.push({ name: 'tenants' })
+    })
+    .catch((error) => {
+      notyf.error(error.response.data.message)
+      errors.value.show = true
+      errors.value.data = formatErrors(error.response.data.errors)
+      isLoading.value = false
+    })
 }
 
 onMounted(() => {
   isLoading.value = true
 
-  service.handleShowTenant(routeParams.id)
-  .then(response => {
-    defaultValue.value = response.result
-    isLoading.value = false;
-  })
-  .catch(error => {
-    notyf.error(error.response.data.message)
-    router.push({ name: 'tenants' })
-    isLoading.value = false;
-  })
+  service
+    .handleShowTenant(routeParams.id)
+    .then((response) => {
+      defaultValue.value = response.result
+      isLoading.value = false
+    })
+    .catch((error) => {
+      notyf.error(error.response.data.message)
+      router.push({ name: 'tenants' })
+      isLoading.value = false
+    })
 })
 </script>
 
@@ -115,20 +117,17 @@ onMounted(() => {
           You can see pages content samples from 
           files in /src/components/pages directory
         -->
-        <VBreadcrumb :items="breadcrumb" separator="arrow" with-icons />
+      <VBreadcrumb :items="breadcrumb" separator="arrow" with-icons />
 
-        <VProgress 
-          size="tiny" 
-          v-show="isLoading"
-        />
+      <VProgress size="tiny" v-show="isLoading" />
 
-        <TenantFormLayout 
-          title="Update Tenant"
-          @submit="handleOnSubmit" 
-          :loading="isLoading"
-          :errors="errors" 
-          :default-value="defaultValue"
-        />
+      <TenantFormLayout
+        title="Edit Tenant"
+        @submit="handleOnSubmit"
+        :loading="isLoading"
+        :errors="errors"
+        :default-value="defaultValue"
+      />
     </div>
   </SidebarLayout>
 </template>

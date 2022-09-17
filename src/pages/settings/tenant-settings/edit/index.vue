@@ -6,7 +6,7 @@ const viewWrapper = useViewWrapper()
 viewWrapper.setPageTitle('Tenant Settings')
 
 useHead({
-  title: `Tenant Settings - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `Tenant Settings | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 </script>
 

@@ -6,7 +6,7 @@ const viewWrapper = useViewWrapper()
 viewWrapper.setPageTitle('Customization')
 
 useHead({
-  title: `Customization - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `Customization | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 </script>
 

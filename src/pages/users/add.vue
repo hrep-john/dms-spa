@@ -1,8 +1,10 @@
 <route lang="yaml">
 meta:
   rolesAllowed:
-    - superadmin
-    - admin
+    - Superadmin
+    - Admin
+  permissionsAllowed:
+    - 'User: Create'
 </route>
 
 <script setup lang="ts">
@@ -32,7 +34,7 @@ const viewWrapper = useViewWrapper()
 viewWrapper.setPageTitle('Add User')
 
 useHead({
-  title: `Add User - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `Add User | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 
 const service = userService.actions
@@ -51,7 +53,7 @@ const breadcrumb = [
   },
 ]
 
-const handleOnSubmit = async (data:any) => {
+const handleOnSubmit = async (data: any) => {
   const response = await handleVuexApiCall(service.handleStoreUser, data)
 
   isLoading.value = false
@@ -63,11 +65,12 @@ const handleOnSubmit = async (data:any) => {
     const errors = response?.body?.errors
 
     for (let key of Object.keys(errors)) {
-        errors[key].forEach(error => { notyf.error(error) });
+      errors[key].forEach((error) => {
+        notyf.error(error)
+      })
     }
   }
 }
-
 </script>
 
 <template>
@@ -80,20 +83,17 @@ const handleOnSubmit = async (data:any) => {
           You can see pages content samples from 
           files in /src/components/pages directory
         -->
-        <VBreadcrumb :items="breadcrumb" separator="arrow" with-icons />
+      <VBreadcrumb :items="breadcrumb" separator="arrow" with-icons />
 
-        <VProgress 
-          size="tiny" 
-          v-show="isLoading"
-        />
+      <VProgress size="tiny" v-show="isLoading" />
 
-        <UserFormLayout 
-          @submit="handleOnSubmit" 
-          :errors="errors" 
-          :loading="isLoading"
-          :is-new="true" 
-          title="Add a User"
-        />
+      <UserFormLayout
+        @submit="handleOnSubmit"
+        :errors="errors"
+        :loading="isLoading"
+        :is-new="true"
+        title="Add a User"
+      />
     </div>
   </SidebarLayout>
 </template>

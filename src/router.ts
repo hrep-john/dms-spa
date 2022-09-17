@@ -31,9 +31,22 @@ export function createRouter() {
     return flag
   }
 
+  const isPermissionsAllowed = (to: any, userPermissions: any) => {
+    let flag = false
+
+    userPermissions.forEach((userPermission) => {
+      if (to.meta.permissionsAllowed.includes(userPermission)) {
+        flag = true
+      }
+    })
+
+    return flag
+  }
+
   router.beforeEach((to, from, next) => {
     const isAuthenticatedUser = !!localStorage.getItem('token')
     const userRoles = JSON.parse(localStorage.getItem('roles') || '[]')
+    const userPermissions = JSON.parse(localStorage.getItem('permissions') || '[]')
     const isRequiresNoAuth = to.meta.requiresNoAuth
     const isRequiresAuth = !isRequiresNoAuth
 
@@ -61,7 +74,14 @@ export function createRouter() {
       } else {
         next({ name: 'dashboard' })
       }
-    } else if (!!userRoles && !!to.meta.rolesAllowed && !isRolesAllowed(to, userRoles)) {
+      // temporary disabled the roles middleware
+      // } else if (!!userRoles && !!to.meta.rolesAllowed && !isRolesAllowed(to, userRoles)) {
+      //   next({ name: 'dashboard' })
+    } else if (
+      !!userPermissions &&
+      !!to.meta.permissionsAllowed &&
+      !isPermissionsAllowed(to, userPermissions)
+    ) {
       next({ name: 'dashboard' })
     } else if (isRequiresAuth && isAuthenticatedUser && to.name == 'index') {
       next({ name: 'dashboard' })

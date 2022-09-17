@@ -5,7 +5,7 @@ import { computed, ref, onMounted } from 'vue'
 import { useNotyf } from '/@src/composable/useNotyf'
 import { onceImageErrored } from '/@src/utils/via-placeholder'
 import { useUserSession } from '/@src/stores/userSession'
-import { handleVuexApiCall } from '/@src/utils/helper'
+import { handleVuexApiCall, doesUserCan } from '/@src/utils/helper'
 import { useRouter } from 'vue-router'
 import profileService from '/@src/stores/profile'
 
@@ -233,6 +233,7 @@ onMounted(() => {
               color="primary"
               raised
               :loading="isLoading"
+              :disabled="!doesUserCan('Settings: Edit Profile')"
               tabindex="0"
               @keydown.space.prevent="onSubmit"
               @click="onSubmit"

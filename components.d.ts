@@ -42,6 +42,7 @@ declare module 'vue' {
     PreviewDocumentPanel: typeof import('./src/components/partials/panels/PreviewDocumentPanel.vue')['default']
     ReportsMobileSubsidebar: typeof import('./src/layouts/mobile-subsidebars/ReportsMobileSubsidebar.vue')['default']
     ReportsSubsidebar: typeof import('./src/layouts/sidebar-subsidebar/ReportsSubsidebar.vue')['default']
+    RoleFormLayout: typeof import('./src/components/pages/forms/form-layout/RoleFormLayout.vue')['default']
     SettingsProfile: typeof import('./src/components/pages/layouts/profile/SettingsProfile.vue')['default']
     Sidebar: typeof import('./src/components/navigation/desktop/Sidebar.vue')['default']
     SidebarLayout: typeof import('./src/layouts/SidebarLayout.vue')['default']

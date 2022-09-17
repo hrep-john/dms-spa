@@ -1,3 +1,9 @@
+<route lang="yaml">
+meta:
+  permissionsAllowed:
+    - 'Document: Create'
+</route>
+
 <script setup lang="ts">
 /**
  * This is a Vue Component that will be
@@ -44,7 +50,7 @@ const FilePond = vueFilePond(
 )
 
 useHead({
-  title: `Add Document - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `Add Document | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 
 const isLoading = ref(false)
