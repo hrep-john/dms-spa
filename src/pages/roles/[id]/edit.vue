@@ -80,6 +80,7 @@ const handleOnSubmit = async (data: any) => {
 
   if (response.success) {
     notyf.success(response.data.message)
+    userSession.setPermissions(response.data.result.permissions)
     router.push({ name: 'roles' })
   } else {
     const error = response?.body?.message

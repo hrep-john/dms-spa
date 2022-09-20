@@ -50,7 +50,7 @@ const columns = {
   name: 'Name',
   total_permissions: 'Total Permissions',
   updated_at: 'Last Updated',
-  updated_by: 'Updated By',
+  updated_by: 'Modified By',
   actions: {
     label: 'Actions',
     align: 'end',
