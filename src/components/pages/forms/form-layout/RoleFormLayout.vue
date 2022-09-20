@@ -51,8 +51,11 @@ const schema = yup.object(objectSchema)
 
 const notyf = useNotyf()
 const emit = defineEmits(['submit'])
+const selectedModules = ref(Array())
 const selectedPermissions = ref(Array())
-const permissionList = ref(null)
+const references = ref({
+  permissions: [],
+})
 
 const { y } = useWindowScroll()
 
@@ -99,7 +102,7 @@ const fetchPermissions = async () => {
   const response = await handleVuexApiCall(service.handleFetchPermissionList, null)
 
   if (response.success) {
-    permissionList.value = response.data.results
+    references.value.permissions = response.data.results
   } else {
     const error = response?.body?.message
     notyf.error(error)
@@ -109,23 +112,50 @@ const fetchPermissions = async () => {
 }
 
 const onSelectAllPermissions = (module: string) => {
-  const permissionModule = permissionList.value.find(
+  const group = references.value.permissions.find(
     (permission) => permission.module === module
   )
 
-  permissionModule.permissions.forEach((permission) => {
-    onSelectPermission(permission)
-  })
+  const isAllPermissionsSelected = isAllPermissionModuleSelected(group.module)
+
+  // clear all the group permissions
+  selectedPermissions.value = selectedPermissions.value.filter(
+    (selected) => !group.permissions.includes(selected)
+  )
+
+  // force select all group permissions
+  if (!isAllPermissionsSelected) {
+    selectedPermissions.value = selectedPermissions.value.concat(group.permissions)
+  }
 }
 
-const onSelectPermission = (permission: string) => {
-  if (isPermissionAlreadySelected(permission)) {
-    selectedPermissions.value = selectedPermissions.value.filter(
-      (selected) => selected !== permission
-    )
-  } else {
-    selectedPermissions.value.push(permission)
-  }
+const isAllPermissionModuleSelected = (module: string) => {
+  const group = references.value.permissions.find(
+    (permission) => permission.module === module
+  )
+
+  const permissions = group.permissions
+
+  return isArraysEqual(permissions, selectedPermissions.value)
+}
+
+const isArraysEqual = (array1: Array, array2: Array) => {
+  return array1.every((element) => array2.includes(element))
+}
+
+const onSelectPermission = () => {
+  const groups = references.value.permissions
+  let selected: any = []
+
+  groups.forEach((group) => {
+    const isAllPermissionsSelected = isAllPermissionModuleSelected(group.module)
+
+    if (isAllPermissionsSelected) {
+      selected.push(group.module)
+    }
+  })
+
+  selectedModules.value = selected
 }
 
 const isPermissionAlreadySelected = (permission: string) => {
@@ -141,9 +171,16 @@ onMounted(() => {
 })
 
 watch(
-  () => [props.defaultValue],
+  () => props.defaultValue,
   (values) => {
     handleDefaultValue()
+  }
+)
+
+watch(
+  () => selectedPermissions.value,
+  (values) => {
+    onSelectPermission()
   }
 )
 </script>
@@ -281,14 +318,16 @@ watch(
           </div>
 
           <div
-            v-for="(permissionModule, permissionModuleKey) in permissionList"
+            v-for="(permissionModule, permissionModuleKey) in references.permissions"
             :key="permissionModuleKey"
             class="permission-module"
           >
             <hr />
+            <VTag class="mb-2" color="primary" :label="permissionModule.module" />
             <div class="select-all-wrapper">
               <VCheckbox
                 class="px-0"
+                v-model="selectedModules"
                 :value="permissionModule.module"
                 @update:modelValue="onSelectAllPermissions(permissionModule.module)"
                 label="Select All"

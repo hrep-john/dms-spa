@@ -139,7 +139,7 @@ watch(
             </div>
             <div class="column is-6">
               <VField>
-                <label>Updated By</label>
+                <label>Modified By</label>
                 <VControl icon="feather:user">
                   <input
                     type="text"

@@ -80,7 +80,7 @@ const requiredFields = computed(() => {
       value: props?.data?.created_at,
     },
     {
-      label: 'Updated By',
+      label: 'Modified By',
       value: props?.data?.updated_by,
     },
     {
