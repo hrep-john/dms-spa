@@ -72,3 +72,12 @@ export const doesUserCan = (permission: string) => {
 
   return permissions.includes(permission)
 }
+
+export const isJson = (text: string) => {
+  try {
+    JSON.parse(text)
+    return true
+  } catch (error) {
+    return false
+  }
+}
