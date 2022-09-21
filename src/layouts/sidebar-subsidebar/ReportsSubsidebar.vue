@@ -21,57 +21,27 @@ const emit = defineEmits(['close'])
       </div>
     </div>
     <div class="inner" data-simplebar>
+      <li>
+        <RouterLink :to="{ name: 'report-builders' }">Report Builder</RouterLink>
+      </li>
+
+      <li class="divider"></li>
       <ul>
-        <li>
-          <div class="subsidebar-single-link">
-            <i
-              aria-hidden="true"
-              class="iconify sidebar-svg"
-              data-icon="foundation:graph-pie"
-            ></i>
-            <RouterLink :to="{ name: 'users' }">Sample Report 1</RouterLink>
-          </div>
-        </li>
-        <li>
-          <div class="subsidebar-single-link">
-            <i
-              aria-hidden="true"
-              class="iconify sidebar-svg"
-              data-icon="foundation:graph-trend"
-            ></i>
-            <RouterLink :to="{ name: 'users' }">Sample Report 1</RouterLink>
-          </div>
-        </li>
-        <li>
-          <div class="subsidebar-single-link">
-            <i
-              aria-hidden="true"
-              class="iconify sidebar-svg"
-              data-icon="entypo:bar-graph"
-            ></i>
-            <RouterLink :to="{ name: 'users' }">Sample Report 1</RouterLink>
-          </div>
-        </li>
-        <li>
-          <div class="subsidebar-single-link">
-            <i
-              aria-hidden="true"
-              class="iconify sidebar-svg"
-              data-icon="entypo:area-graph"
-            ></i>
-            <RouterLink :to="{ name: 'users' }">Sample Report 1</RouterLink>
-          </div>
-        </li>
-        <li>
-          <div class="subsidebar-single-link">
-            <i
-              aria-hidden="true"
-              class="iconify sidebar-svg"
-              data-icon="material-symbols:auto-graph-rounded"
-            ></i>
-            <RouterLink :to="{ name: 'users' }">Sample Report 1</RouterLink>
-          </div>
-        </li>
+        <VCollapseLinks v-model:open="openSubsidebarLinks" collapse-id="document">
+          <template #header>
+            Document
+            <i aria-hidden="true" class="iconify" data-icon="feather:chevron-right" />
+          </template>
+
+          <RouterLink :to="{ name: 'users' }" class="is-submenu">
+            <i aria-hidden="true" class="lnir lnir-passport"></i>
+            <span>Sample Report 1</span>
+          </RouterLink>
+          <RouterLink :to="{ name: 'tenants' }" class="is-submenu">
+            <i aria-hidden="true" class="lnir lnir-passport"></i>
+            <span>Sample Report 2</span>
+          </RouterLink>
+        </VCollapseLinks>
       </ul>
     </div>
   </div>

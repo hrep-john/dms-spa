@@ -11,14 +11,6 @@ const actions = {
     return response.data
   },
 
-  async handleFetchPermissionList(payload: any) {
-    const response = await api.get(`api/roles/permissions/list`, {
-      params: payload,
-    })
-
-    return response.data
-  },
-
   async handleShowRole(id: any) {
     const response = await api.get(`api/roles/${id}`)
 
@@ -52,6 +44,22 @@ const actions = {
 
   async handleDeleteRole(id: any) {
     const response = await api.delete(`/api/roles/${id}`)
+
+    return response.data
+  },
+
+  async handleFetchRoleList(payload: any) {
+    const response = await api.get(`api/roles/list`, {
+      params: payload,
+    })
+
+    return response.data
+  },
+
+  async handleFetchPermissionList(payload: any) {
+    const response = await api.get(`api/roles/permissions/list`, {
+      params: payload,
+    })
 
     return response.data
   },

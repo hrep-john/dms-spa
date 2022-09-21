@@ -2,9 +2,6 @@
 meta:
   rolesAllowed:
     - Superadmin
-    - Admin
-  permissionsAllowed:
-    - 'User: View List'
 </route>
 
 <script setup lang="ts">
@@ -24,21 +21,21 @@ import { useHead } from '@vueuse/head'
 import { useViewWrapper } from '/@src/stores/viewWrapper'
 import { onMounted, ref, computed, watch } from 'vue'
 import { useNotyf } from '/@src/composable/useNotyf'
-import userService from '/@src/stores/users'
+import reportBuilderService from '/@src/stores/reportBuilders'
 import debounce from 'lodash.debounce'
 import { useRouter } from 'vue-router'
 import { handleVuexApiCall, doesUserCan } from '/@src/utils/helper'
 
 useHead({
-  title: `User List | ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `Report Builder List | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 
 const router = useRouter()
 const notyf = useNotyf()
 const viewWrapper = useViewWrapper()
-viewWrapper.setPageTitle('User List')
+viewWrapper.setPageTitle('Report Builder List')
 
-const service = userService.actions
+const service = reportBuilderService.actions
 
 const isLoading = ref(true)
 const search = ref('')
@@ -47,9 +44,10 @@ const page = ref(1)
 const deleteConfirm = ref({ visible: false, selected: 0 })
 
 const columns = {
-  username: 'User ID',
-  email: 'Email',
-  full_name: 'Full Name',
+  name: 'Name',
+  module: 'Module',
+  updated_at: 'Last Updated',
+  updated_by: 'Updated By',
   actions: {
     label: 'Actions',
     align: 'end',
@@ -65,7 +63,7 @@ const paginate = async (page = 1) => {
     filters: buildFilters(),
   }
 
-  const response = await handleVuexApiCall(service.handleGetUsers, payload)
+  const response = await handleVuexApiCall(service.handleGetReportBuilders, payload)
 
   if (response.success) {
     const formatted = formatData(response.data.results.data)
@@ -80,14 +78,7 @@ const paginate = async (page = 1) => {
 }
 
 const buildFilters = () => {
-  const columns = [
-    'tenants.name',
-    'users.username',
-    'users.email',
-    'user_infos.first_name',
-    'user_infos.middle_name',
-    'user_infos.last_name',
-  ]
+  const columns = ['name', 'updated_at']
   const filters = Array()
 
   columns.forEach((column) => {
@@ -105,23 +96,7 @@ const buildFilters = () => {
 }
 
 function formatData(data: any) {
-  let formatted = []
-
-  for (let i = 0; i < data.length; i++) {
-    const user = data[i]
-
-    formatted.push({
-      id: user.id,
-      tenant_name: user.user_info.tenant_name,
-      full_name: `${user.user_info.first_name ?? ''} ${
-        user.user_info.middle_name ?? ''
-      } ${user.user_info.last_name ?? ''}`,
-      username: user.username,
-      email: user.email,
-    })
-  }
-
-  return formatted
+  return data
 }
 
 const searchRecords = debounce(async () => {
@@ -136,7 +111,7 @@ const clearRecords = async () => {
 }
 
 const onHandleUpdateRecord = (id: any) => {
-  router.push(`/users/${id}/edit`)
+  router.push(`/report-builders/${id}/edit`)
 }
 
 const onHandleDeleteRecord = (id: any) => {
@@ -163,12 +138,12 @@ const getSelectedRow = (id: any) => {
     return ''
   }
 
-  return row?.full_name
+  return row?.name
 }
 
 const handleOnDeletedRecord = async (close) => {
   const response = await handleVuexApiCall(
-    service.handleDeleteUser,
+    service.handleDeleteReportBuilder,
     deleteConfirm.value.selected
   )
 
@@ -199,7 +174,7 @@ watch(
 </script>
 
 <template>
-  <SidebarLayout>
+  <SidebarLayout default-sidebar="reports">
     <!-- Content Wrapper -->
     <div class="page-content-inner">
       <!--
@@ -220,15 +195,15 @@ watch(
         </VField>
 
         <VButtons>
-          <RouterLink :to="{ name: 'users-add' }">
-            <VButton color="primary" icon="fas fa-plus"> Add User </VButton>
+          <RouterLink :to="{ name: 'report-builders-add' }">
+            <VButton color="primary" icon="fas fa-plus"> Add Custom Report </VButton>
           </RouterLink>
         </VButtons>
       </div>
 
       <FlexListV1
-        :with-edit="doesUserCan('User: Edit User')"
-        :with-delete="doesUserCan('User: Delete User')"
+        :with-edit="true"
+        :with-delete="true"
         :is-loading="isLoading"
         :datatable="datatable"
         :columns="columns"

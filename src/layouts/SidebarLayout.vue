@@ -162,7 +162,7 @@ watch(
             </template>
           </Tippy>
         </li>
-        <!-- <li v-if="isAdmin">
+        <li>
           <Tippy placement="right">
             <a
               aria-label="Manage Reports"
@@ -171,7 +171,7 @@ watch(
               @keydown.space.prevent="activeMobileSubsidebar = 'reports'"
               @click="activeMobileSubsidebar = 'reports'"
             >
-              <i aria-hidden="true" class="iconify" data-icon="bi:graph-up-arrow"></i>
+              <i aria-hidden="true" class="iconify" data-icon="feather:file-text"></i>
             </a>
             <template #content>
               <div class="v-popover-content is-text">
@@ -184,7 +184,7 @@ watch(
               </div>
             </template>
           </Tippy>
-        </li> -->
+        </li>
         <li v-if="isSuperadmin">
           <Tippy placement="right">
             <RouterLink :to="{ name: 'tenants' }">
@@ -314,7 +314,7 @@ watch(
             </template>
           </Tippy>
         </li>
-        <!-- <li v-if="isAdmin">
+        <li>
           <Tippy placement="right">
             <a
               :class="[activeMobileSubsidebar === 'reports' && 'is-active']"
@@ -327,7 +327,7 @@ watch(
               <i
                 aria-hidden="true"
                 class="iconify sidebar-svg"
-                data-icon="bi:graph-up-arrow"
+                data-icon="feather:file-text"
               ></i>
             </a>
             <template #content>
@@ -341,8 +341,8 @@ watch(
               </div>
             </template>
           </Tippy>
-        </li> -->
-        <li v-if="isSuperadmin && doesUserCan('Tenant: View List')">
+        </li>
+        <li v-if="isSuperadmin">
           <Tippy placement="right">
             <RouterLink :to="{ name: 'tenants' }">
               <i

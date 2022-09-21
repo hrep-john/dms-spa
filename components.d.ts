@@ -40,6 +40,7 @@ declare module 'vue' {
     PlaceloadV2: typeof import('./src/components/pages/layouts/placeload/PlaceloadV2.vue')['default']
     PlaceloadV4: typeof import('./src/components/pages/layouts/placeload/PlaceloadV4.vue')['default']
     PreviewDocumentPanel: typeof import('./src/components/partials/panels/PreviewDocumentPanel.vue')['default']
+    ReportBuilderFormLayout: typeof import('./src/components/pages/forms/form-layout/ReportBuilderFormLayout.vue')['default']
     ReportsMobileSubsidebar: typeof import('./src/layouts/mobile-subsidebars/ReportsMobileSubsidebar.vue')['default']
     ReportsSubsidebar: typeof import('./src/layouts/sidebar-subsidebar/ReportsSubsidebar.vue')['default']
     RoleFormLayout: typeof import('./src/components/pages/forms/form-layout/RoleFormLayout.vue')['default']
