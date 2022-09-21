@@ -33,13 +33,9 @@ const emit = defineEmits(['close'])
             <i aria-hidden="true" class="iconify" data-icon="feather:chevron-right" />
           </template>
 
-          <RouterLink :to="{ name: 'users' }" class="is-submenu">
+          <RouterLink to="/custom-reports/document-incoming-report" class="is-submenu">
             <i aria-hidden="true" class="lnir lnir-passport"></i>
-            <span>Sample Report 1</span>
-          </RouterLink>
-          <RouterLink :to="{ name: 'tenants' }" class="is-submenu">
-            <i aria-hidden="true" class="lnir lnir-passport"></i>
-            <span>Sample Report 2</span>
+            <span>Document Incoming Report</span>
           </RouterLink>
         </VCollapseLinks>
       </ul>
