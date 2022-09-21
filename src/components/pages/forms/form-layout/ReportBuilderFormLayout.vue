@@ -81,20 +81,20 @@ const user = computed(() => {
   return JSON.parse(userSession.user || '')
 })
 
-const onSubmit = handleSubmit(async (values) => {
+const onSubmit = handleSubmit((values) => {
   let isValid = true
 
-  if (await !isJson(values?.query)) {
+  if (!isJson(values?.query)) {
     notyf.error('Query should be a valid JSON Object.')
     isValid = false
   }
 
-  if (await !isJson(values?.column_settings)) {
+  if (!isJson(values?.column_settings)) {
     notyf.error('Column settings should be a valid JSON Object.')
     isValid = false
   }
 
-  if (await !isJson(values?.filters)) {
+  if (!isJson(values?.filters)) {
     notyf.error('Filters should be a valid JSON Object.')
     isValid = false
   }

@@ -23,6 +23,7 @@ import { ref, onMounted } from 'vue'
 import { useNotyf } from '/@src/composable/useNotyf'
 import tenantService from '/@src/stores/tenants'
 import { useRouter } from 'vue-router'
+import { handleVuexApiCall } from '/@src/utils/helper'
 
 const router = useRouter()
 const notyf = useNotyf()
@@ -90,20 +91,28 @@ const handleOnSubmit = async (data: any) => {
     })
 }
 
-onMounted(() => {
+const fetchDefaultValues = async () => {
+  if (isLoading.value) {
+    return
+  }
+
   isLoading.value = true
 
-  service
-    .handleShowTenant(routeParams.id)
-    .then((response) => {
-      defaultValue.value = response.result
-      isLoading.value = false
-    })
-    .catch((error) => {
-      notyf.error(error.response.data.message)
-      router.push({ name: 'tenants' })
-      isLoading.value = false
-    })
+  const response = await handleVuexApiCall(service.handleShowTenant, routeParams.id)
+
+  isLoading.value = false
+
+  if (response.success) {
+    defaultValue.value = response.data.result
+  } else {
+    const error = response?.body?.message
+    notyf.error(error)
+    router.push({ name: 'tenants' })
+  }
+}
+
+onMounted(async () => {
+  await fetchDefaultValues()
 })
 </script>
 

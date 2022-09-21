@@ -254,10 +254,10 @@ const showDeleteConfirmation = () => {
   deleteConfirm.value = true
 }
 
-onMounted(() => {
+onMounted(async () => {
   window.addEventListener('scroll', handleScroll)
-  initializeFilterOptions()
-  paginate(1, true)
+  await initializeFilterOptions()
+  await paginate(1, true)
 })
 
 onBeforeUnmount(() => {
@@ -346,25 +346,28 @@ const initializeFilterOptions = async (initial = false) => {
     return
   }
 
-  try {
-    const payload: any = {
-      filters: [
-        {
-          column: 'entitable_type',
-          operator: '=',
-          join: 'OR',
-          value: ModuleEnum.Document,
-        },
-      ],
-    }
+  isLoading.value = true
 
-    let response = await udfService.handleGetUdfs(payload)
+  const payload: any = {
+    filters: [
+      {
+        column: 'entitable_type',
+        operator: '=',
+        join: 'OR',
+        value: ModuleEnum.Document,
+      },
+    ],
+  }
 
-    formatUdfResults(response.results.data)
+  const response = await handleVuexApiCall(udfService.handleGetUdfs, payload)
 
-    isLoading.value = false
-  } catch (error) {
-    notyf.error(error.response.data.message)
+  isLoading.value = false
+
+  if (response.success) {
+    formatUdfResults(response.data.results.data)
+  } else {
+    const error = response?.body?.message
+    notyf.error(error)
   }
 }
 

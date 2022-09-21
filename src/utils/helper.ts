@@ -26,6 +26,15 @@ export const handleVuexApiCall = async (vuexAction, payload) => {
           type: 'error',
         },
       }
+    } else if (err.code === 'ECONNABORTED') {
+      return {
+        success: false,
+        body: {
+          message:
+            'Looks like the server is taking too long to responds. Please contact our technical team for support.',
+          type: 'error',
+        },
+      }
     } else {
       // Throw an error if the error is not an HTTP response
       throw err

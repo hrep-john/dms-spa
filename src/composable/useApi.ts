@@ -8,6 +8,7 @@ export function createApi() {
   // Here we set the base URL for all requests made to the api
   api = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
+    timeout: 5000,
   })
 
   const domain = window.location.host

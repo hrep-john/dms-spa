@@ -43,11 +43,11 @@ useHead({
 })
 
 const onSubmitEventHandler = async (data: any) => {
-  isLoading.value = true
-
-  if (!isLoading.value) {
+  if (isLoading.value) {
     return
   }
+
+  isLoading.value = true
 
   const user = JSON.parse(userSession.user)
 

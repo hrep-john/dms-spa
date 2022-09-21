@@ -60,11 +60,11 @@ const breadcrumb = [
 const defaultValue = ref()
 
 const handleOnSubmit = async (data: any) => {
-  isLoading.value = true
-
-  if (!isLoading.value) {
+  if (isLoading.value) {
     return
   }
+
+  isLoading.value = true
 
   const payload = {
     id: routeParams.id,
@@ -84,7 +84,11 @@ const handleOnSubmit = async (data: any) => {
   }
 }
 
-onMounted(async () => {
+const fetchDefaultValues = async () => {
+  if (isLoading.value) {
+    return
+  }
+
   isLoading.value = true
 
   const response = await handleVuexApiCall(
@@ -95,12 +99,17 @@ onMounted(async () => {
   isLoading.value = false
 
   if (response.success) {
-    defaultValue.value = response.data.result
+    const result = response.data.result
+    defaultValue.value = result
   } else {
     const error = response?.body?.message
     notyf.error(error)
     router.push({ name: 'report-builders' })
   }
+}
+
+onMounted(async () => {
+  await fetchDefaultValues()
 })
 </script>
 
