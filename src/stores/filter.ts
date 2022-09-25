@@ -35,6 +35,10 @@ export const useFilter = defineStore('filter', () => {
     return outerGroup
   }
 
+  function getFilterDropdownData() {
+    return filterDropdownData.value
+  }
+
   function setFilterItem(newData: any, index: Number) {
     filterData.value[index] = newData
   }
@@ -62,6 +66,7 @@ export const useFilter = defineStore('filter', () => {
     removeFilterDropdownItem,
     sortedFilterDropdownData,
     getFormattedFilterDropdownData,
+    getFilterDropdownData,
   } as const
 })
 

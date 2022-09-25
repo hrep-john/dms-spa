@@ -22,15 +22,19 @@ import { useViewWrapper } from '/@src/stores/viewWrapper'
 import { onMounted, ref, computed } from 'vue'
 import { useNotyf } from '/@src/composable/useNotyf'
 import { useRouter } from 'vue-router'
+import { useUserSession } from '/@src/stores/userSession'
 import ModuleEnum from '/@src/enums/module'
 import documentServices from '/@src/stores/documents'
+import userServices from '/@src/stores/users'
 import udfServices from '/@src/stores/udfs'
 import { handleVuexApiCall, createTempDownloadBtnLink } from '/@src/utils/helper'
 import UdfEnum from '/@src/enums/udf'
+import UserLevelEnum from '/@src/enums/userLevel'
 
 const router = useRouter()
 const notyf = useNotyf()
 const viewWrapper = useViewWrapper()
+const userSession = useUserSession()
 viewWrapper.setPageTitle('Edit Details')
 
 useHead({
@@ -39,18 +43,21 @@ useHead({
 
 const routeParams = router.currentRoute.value.params
 const documentService = documentServices.actions
+const userService = userServices.actions
 const udfService = udfServices.actions
 const isLoading = ref(false)
+const users = ref({
+  options: [],
+  selected: [],
+})
 const udfs = ref([])
 const udfDates = ref([])
 const details = ref({
   user_defined_field: [],
+  allow_user_access: false,
+  created_by: null,
 })
 const auditLogs = ref([])
-const accessControl = ref({
-  allow_all: true,
-  selected_users: [],
-})
 
 const breadcrumb = [
   {
@@ -65,6 +72,18 @@ const breadcrumb = [
   },
 ]
 
+const columns = {
+  full_name: 'Full Name',
+} as const
+
+const user = computed(() => {
+  if (userSession.user === undefined) {
+    return {}
+  }
+
+  return JSON.parse(userSession.user || '')
+})
+
 const submit = async () => {
   if (isLoading.value) {
     return
@@ -75,6 +94,8 @@ const submit = async () => {
   const payload = {
     id: routeParams.id,
     user_defined_field: getUdfsValue(),
+    allow_user_access: details.value.allow_user_access,
+    user_access: users.value.selected,
   }
 
   const response = await handleVuexApiCall(
@@ -214,6 +235,7 @@ const getDocumentMetadata = async (initial = false) => {
 
   if (response.success) {
     details.value = response.data.result
+    users.value.selected = response.data.result.user_access
   } else {
     const error = response?.body?.message
     notyf.error(error)
@@ -264,9 +286,38 @@ const handleOnDownloadDocument = async (id: any) => {
   }
 }
 
+const getUserLists = async () => {
+  if (isLoading.value) {
+    return
+  }
+
+  const payload: any = {
+    filters: [
+      // exclude superadmin and admin user level
+      { column: 'user_level', operator: '=', join: 'AND', value: UserLevelEnum.Regular },
+      // exclude current user id
+      { column: 'id', operator: '!=', join: 'AND', value: user.value.id },
+      // exclude document owner
+      { column: 'id', operator: '!=', join: 'AND', value: details.value.created_by },
+    ],
+  }
+
+  const response = await handleVuexApiCall(userService.handleFetchUserList, payload)
+
+  if (response.success) {
+    users.value.options = formatDropdownOptions(response.data.results)
+  } else {
+    const error = response?.body?.message
+    notyf.error(error)
+  }
+
+  isLoading.value = false
+}
+
 onMounted(async () => {
   await getUdfs(true)
   await getDocumentMetadata(true)
+  await getUserLists()
   await getDocumentAuditLogs(true)
 })
 </script>
@@ -326,17 +377,22 @@ onMounted(async () => {
             </div>
           </div>
           <div class="form-body">
-            <!-- { label: 'Manage Access', value: 'manage-access', icon: 'fas fa-users' }, -->
             <VTabs
               selected="details"
               :tabs="[
                 { label: 'Details', value: 'details', icon: 'fas fa-info-circle' },
+                { label: 'Access', value: 'user-access', icon: 'fas fa-users' },
                 { label: 'Activity', value: 'activity', icon: 'fas fa-history' },
               ]"
             >
               <template #tab="{ activeValue }">
                 <div v-if="activeValue === 'details'">
+                  <!-- Form Fieldset -->
                   <div class="form-fieldset">
+                    <div class="fieldset-heading">
+                      <h4>Required Metadata</h4>
+                      <p>These fields are required and not editable.</p>
+                    </div>
                     <div class="columns is-multiline">
                       <div class="column is-4">
                         <VField>
@@ -358,7 +414,7 @@ onMounted(async () => {
                             <input
                               type="text"
                               class="input"
-                              :value="details.created_by"
+                              :value="details.formatted_created_by"
                               :disabled="true"
                             />
                           </VControl>
@@ -371,7 +427,7 @@ onMounted(async () => {
                             <input
                               type="text"
                               class="input"
-                              :value="details.created_at"
+                              :value="details.formatted_created_at"
                               :disabled="true"
                             />
                           </VControl>
@@ -397,7 +453,7 @@ onMounted(async () => {
                             <input
                               type="text"
                               class="input"
-                              :value="details.updated_by"
+                              :value="details.formatted_updated_by"
                               :disabled="true"
                             />
                           </VControl>
@@ -410,26 +466,38 @@ onMounted(async () => {
                             <input
                               type="text"
                               class="input"
-                              :value="details.updated_at"
+                              :value="details.formatted_updated_at"
                               :disabled="true"
                             />
                           </VControl>
                         </VField>
                       </div>
-                      <div class="column is-4" v-for="(udf, key) in udfs" :key="key">
+                    </div>
+                  </div>
+
+                  <!-- Form Fieldset -->
+                  <div class="form-fieldset">
+                    <div class="fieldset-heading">
+                      <h4>User Defined Metadata</h4>
+                      <p>
+                        These fields are optional and editable. By default, newly uploaded
+                        documents have no default user defined metadata.
+                      </p>
+                    </div>
+                    <div class="columns is-multiline">
+                      <div class="column is-12" v-for="(udf, key) in udfs" :key="key">
                         <!-- TEXT FIELD -->
                         <label>{{ udf.name }}</label>
 
                         <textarea
                           type="textarea"
                           name="textarea"
-                          class="input is-height-auto"
+                          class="textarea"
                           v-if="udf.type == 'text'"
                           v-model="details.user_defined_field[udf.column]"
                           placeholder="Input text here.."
                           :disabled="isLoading"
                           rows="5"
-                          cols="50"
                         />
 
                         <!-- NUMBER FIELD -->
@@ -483,24 +551,64 @@ onMounted(async () => {
                     </div>
                   </div>
                 </div>
-                <div v-else-if="activeValue === 'access-control'">
-                  <VSwitchBlock
-                    v-model="accessControl.allow_all"
-                    checked
-                    label="Allow All Users"
-                    color="primary"
-                  />
-                  <VControl v-if="!accessControl.allow_all" class="mt-2">
-                    <Multiselect
-                      v-model="tagsValue"
-                      :attrs="{ id }"
-                      mode="tags"
-                      :searchable="true"
-                      :create-tag="true"
-                      :options="tagsOptions"
-                      placeholder="Add Users"
-                    />
-                  </VControl>
+                <div v-else-if="activeValue === 'user-access'">
+                  <!--Fieldset-->
+                  <div class="form-fieldset">
+                    <div class="fieldset-heading">
+                      <h4>Who has access?</h4>
+                      <p>Manage user access for this document.</p>
+                    </div>
+
+                    <div class="columns is-multiline">
+                      <div class="column is-12">
+                        <VField>
+                          <label
+                            >Do you want to allow other users to access this document?
+                          </label>
+                          <VRadio
+                            v-model="details.allow_user_access"
+                            :value="true"
+                            :disabled="isLoading"
+                            label="Yes"
+                            name="outlined_squared_radio"
+                            color="primary"
+                            square
+                          />
+                          <VRadio
+                            v-model="details.allow_user_access"
+                            :value="false"
+                            :disabled="isLoading"
+                            label="No"
+                            name="outlined_squared_radio"
+                            color="primary"
+                            square
+                          />
+                        </VField>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!--Fieldset-->
+                  <div class="form-fieldset py-0" v-show="details.allow_user_access">
+                    <div class="fieldset-heading">
+                      <h4>People with also access</h4>
+                    </div>
+
+                    <div class="columns is-multiline">
+                      <div class="column is-12">
+                        <VField>
+                          <Multiselect
+                            v-model="users.selected"
+                            mode="tags"
+                            placeholder="Enter user's full name here..."
+                            :searchable="true"
+                            :disabled="isLoading"
+                            :options="users.options"
+                          />
+                        </VField>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div v-else-if="activeValue === 'activity'">
                   <DocumentHistoryTimeline :items="auditLogs" />

@@ -8,6 +8,10 @@ const props = defineProps({
     type: Array,
     default: [],
   },
+  right: {
+    type: Boolean,
+    default: true,
+  },
 })
 
 const notyf = useNotyf()
@@ -65,7 +69,7 @@ onMounted(() => {})
 </script>
 
 <template>
-  <VDropdown right class="filter-dropdown" ref="dropdown">
+  <VDropdown class="filter-dropdown" :class="{ 'is-right': props.right }" ref="dropdown">
     <template #button="{ toggle }">
       <VIconBox class="radius-25 mr-1" color="light" bordered @click="toggle">
         <i class="fas fa-filter"></i>

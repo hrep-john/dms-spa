@@ -19,12 +19,13 @@ meta:
 
 import { useHead } from '@vueuse/head'
 import { useViewWrapper } from '/@src/stores/viewWrapper'
-import { onMounted, ref, computed, watch } from 'vue'
+import { onMounted, onBeforeUnmount, ref, computed, watch } from 'vue'
 import { useNotyf } from '/@src/composable/useNotyf'
 import customReportService from '/@src/stores/customReports'
 import debounce from 'lodash.debounce'
 import { useRouter } from 'vue-router'
 import { handleVuexApiCall, doesUserCan } from '/@src/utils/helper'
+import { useFilter } from '/@src/stores/filter'
 
 useHead({
   title: `Custom Report | ${import.meta.env.VITE_PROJECT_NAME}`,
@@ -33,6 +34,7 @@ useHead({
 const router = useRouter()
 const notyf = useNotyf()
 const viewWrapper = useViewWrapper()
+const filtermixins = useFilter()
 viewWrapper.setPageTitle('')
 
 const service = customReportService.actions
@@ -44,6 +46,9 @@ const page = ref(1)
 const routeParams = router.currentRoute.value.params
 const info = ref({})
 const columnSettings = ref({})
+const filters = ref({
+  options: [],
+})
 
 const fetchCustomReport = async (page = 1) => {
   isLoading.value = true
@@ -65,6 +70,7 @@ const fetchCustomReport = async (page = 1) => {
     viewWrapper.setPageTitle(info.value.name)
     document.title = `${info.value.name} | ${import.meta.env.VITE_PROJECT_NAME}`
     columnSettings.value = JSON.parse(JSON.parse(info.value.format).column_settings)
+    filters.value.options = JSON.parse(JSON.parse(info.value.format).filters)
   } else {
     const error = response?.body?.message
     notyf.error(error)
@@ -75,7 +81,7 @@ const fetchCustomReport = async (page = 1) => {
 
 const buildFilters = () => {
   const columns = ['name', 'updated_at']
-  const filters = Array()
+  let filters = []
 
   columns.forEach((column) => {
     if (search.value != '') {
@@ -87,6 +93,10 @@ const buildFilters = () => {
       })
     }
   })
+
+  filters = filtermixins.getFilterDropdownData()
+
+  console.log('filters', filters)
 
   return filters
 }
@@ -138,6 +148,17 @@ watch(
     searchRecords()
   }
 )
+
+watch(
+  () => filtermixins.filterDropdownData,
+  (value) => {
+    searchRecords(value)
+  }
+)
+
+onBeforeUnmount(() => {
+  filtermixins.setFilterDropdownItem([])
+})
 </script>
 
 <template>
@@ -161,11 +182,44 @@ watch(
           </VControl>
         </VField>
 
+        <Tippy placement="top">
+          <FilterDropdown :filters="filters.options" :right="false" />
+          <template #content>
+            <div class="v-popover-content is-text">
+              <div class="popover-head">
+                <h4 class="dark-inverted">Advanced Search</h4>
+              </div>
+            </div>
+          </template>
+        </Tippy>
+
         <VButtons>
           <RouterLink :to="{ name: 'report-builders-add' }">
             <VButton color="info" icon="fas fa-print"> Print </VButton>
           </RouterLink>
         </VButtons>
+      </div>
+
+      <div class="filters" v-if="filtermixins.filterDropdownData.length > 0">
+        <VField grouped multiline>
+          <h4 class="is-6 mr-2 is-narrow title">Advanced Search</h4>
+          <VControl
+            v-for="(filterItem, filterItemKey) in filtermixins.filterDropdownData"
+            :key="filterItemKey"
+          >
+            <VTags addons>
+              <VTag
+                :label="`${filterItem.label} is ${filterItem.value}`"
+                color="primary"
+                elevated
+              />
+              <VTag
+                remove
+                @click="filtermixins.removeFilterDropdownItem(filterItemKey)"
+              />
+            </VTags>
+          </VControl>
+        </VField>
       </div>
 
       <FlexPaginationList
@@ -177,3 +231,16 @@ watch(
     </div>
   </SidebarLayout>
 </template>
+
+<style lang="scss">
+.filters {
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+
+  .title {
+    min-width: 140px;
+    margin-top: 0.4rem;
+  }
+}
+</style>

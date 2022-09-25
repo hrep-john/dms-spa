@@ -104,7 +104,7 @@ const user = computed(() => {
 })
 
 const buildFilters = () => {
-  const tenantFilter = `(tenant_id = ${user.value.tenant_id})`
+  const tenantFilter = `(tenant_id = ${user.value.tenant_id}) AND (user_access = ${user.value.id})`
   const operator = filtermixins.filterDropdownData.length > 0 ? ' AND ' : ''
   return `${tenantFilter}${operator}${filtermixins.getFormattedFilterDropdownData()}`
 }
@@ -427,10 +427,6 @@ const formatUdfResults = (udfData: any) => {
   udfs.value = udfLists
 }
 
-const onRemoveFilterDropdownItem = (index: number) => {
-  filtermixins.removeFilterDropdownItem(index)
-}
-
 const onSearchEventHandler = (event: any) => {
   clearRecords()
   clearSearchRecords()
@@ -455,6 +451,10 @@ watch(
     onSearchEventHandler(value)
   }
 )
+
+onBeforeUnmount(() => {
+  filtermixins.setFilterDropdownItem([])
+})
 </script>
 
 <template>
@@ -602,7 +602,10 @@ watch(
                 color="primary"
                 elevated
               />
-              <VTag remove @click="onRemoveFilterDropdownItem(filterItemKey)" />
+              <VTag
+                remove
+                @click="filtermixins.removeFilterDropdownItem(filterItemKey)"
+              />
             </VTags>
           </VControl>
         </VField>
