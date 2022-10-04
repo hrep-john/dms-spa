@@ -1,6 +1,17 @@
 <script setup lang="ts">
 const emit = defineEmits(['update', 'delete'])
 
+const props = defineProps({
+  withDelete: {
+    type: Boolean,
+    default: true,
+  },
+  withEdit: {
+    type: Boolean,
+    default: true,
+  },
+})
+
 const updateRecord = () => {
   emit('update')
 }
@@ -13,7 +24,12 @@ const deleteRecord = () => {
 <template>
   <VDropdown icon="feather:more-vertical" class="is-pushed-mobile" spaced right>
     <template #content="{ close }">
-      <a role="menuitem" class="dropdown-item is-media" @click="updateRecord">
+      <a
+        v-if="props.withEdit"
+        role="menuitem"
+        class="dropdown-item is-media"
+        @click="updateRecord"
+      >
         <div class="icon">
           <i aria-hidden="true" class="fas fa-edit"></i>
         </div>
@@ -23,9 +39,14 @@ const deleteRecord = () => {
         </div>
       </a>
 
-      <hr class="dropdown-divider" />
+      <hr v-if="props.withEdit" class="dropdown-divider" />
 
-      <a role="menuitem" class="dropdown-item is-media" @click="deleteRecord">
+      <a
+        v-if="props.withDelete"
+        role="menuitem"
+        class="dropdown-item is-media"
+        @click="deleteRecord"
+      >
         <div class="icon">
           <i aria-hidden="true" class="fas fa-trash"></i>
         </div>

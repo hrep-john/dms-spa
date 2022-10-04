@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { usePanels } from '/@src/stores/panels'
+import { toDateString } from '/@src/utils/helper'
 import { onceImageErrored } from '/@src/utils/via-placeholder'
+import UdfEnum from '/@src/enums/udf'
 
 type TabId = 'details' | 'preview'
 
@@ -80,7 +82,7 @@ const requiredFields = computed(() => {
       value: props?.data?.created_at,
     },
     {
-      label: 'Updated By',
+      label: 'Modified By',
       value: props?.data?.updated_by,
     },
     {
@@ -89,6 +91,16 @@ const requiredFields = computed(() => {
     },
   ]
 })
+
+const formatUdfValue = (udf: any) => {
+  let value = udf.value
+
+  if (udf.type === UdfEnum.Types.Date.value) {
+    value = toDateString(udf.value)
+  }
+
+  return value
+}
 
 watch(
   () => panels.active,
@@ -115,7 +127,7 @@ watch(
 
     <div class="right-panel">
       <div class="right-panel-head">
-        <h3>View Document</h3>
+        <h3>Preview Document</h3>
         <a
           class="close-panel"
           tabindex="0"
@@ -135,7 +147,7 @@ watch(
             </div>
             <div v-for="(udf, key) in udfs" :key="key" class="column is-6">
               <h3 class="subtitle is-narrow is-6">{{ udf.label }}</h3>
-              <p class="">{{ udf.value }}</p>
+              <p class="">{{ formatUdfValue(udf) }}</p>
             </div>
           </div>
         </div>

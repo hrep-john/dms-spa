@@ -19,6 +19,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  withDelete: {
+    type: Boolean,
+    default: true,
+  },
+  withEdit: {
+    type: Boolean,
+    default: true,
+  },
 })
 
 const emit = defineEmits(['update', 'delete', 'paginate'])
@@ -127,6 +135,8 @@ const loadMore = () => {
                 </VFlexTableCell>
                 <VFlexTableCell :column="{ align: 'end' }">
                   <FlexTableDropdown
+                    :with-edit="props.withEdit"
+                    :with-delete="props.withDelete"
                     @update="onClickUpdate(item.id)"
                     @delete="onClickDelete(item.id)"
                   />

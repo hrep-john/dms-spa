@@ -173,7 +173,7 @@ watch(
     width: 40px;
     border-radius: var(--radius-rounded);
     background-color: v-bind(colorHex);
-    box-shadow: var(--primary-box-shadow);
+    box-shadow: var(--light-box-shadow);
   }
 
   .meta {

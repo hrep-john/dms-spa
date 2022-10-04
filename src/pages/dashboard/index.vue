@@ -19,7 +19,7 @@ import { useNotyf } from '/@src/composable/useNotyf'
 import dashboardServices from '/@src/stores/dashboard'
 
 useHead({
-  title: `Dashboard - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `Dashboard | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 
 const notyf = useNotyf()

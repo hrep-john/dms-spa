@@ -3,6 +3,9 @@ import { useWindowScroll } from '@vueuse/core'
 import { computed, ref, onMounted, watch } from 'vue'
 import { useNotyf } from '/@src/composable/useNotyf'
 import { useUserSession } from '/@src/stores/userSession'
+import { handleVuexApiCall } from '/@src/utils/helper'
+import roleService from '/@src/stores/roles'
+import UserLevelEnum from '/@src/enums/userLevel'
 
 import { Field, useForm } from 'vee-validate'
 import { useI18n } from 'vue-i18n'
@@ -10,6 +13,8 @@ import * as yup from 'yup'
 
 const { t } = useI18n()
 const userSession = useUserSession()
+
+const service = roleService.actions
 
 const props = defineProps({
   errors: {
@@ -117,8 +122,13 @@ const schema = yup.object(objectSchema)
 
 const notyf = useNotyf()
 const emit = defineEmits(['submit'])
-const roleList = ref(Array())
-const sexList = ref(Array())
+const references = ref({
+  roles: [],
+  sex: {
+    male: 'Male',
+    female: 'Female',
+  },
+})
 
 const { y } = useWindowScroll()
 
@@ -141,13 +151,28 @@ const user = computed(() => {
   return JSON.parse(userSession.user || '')
 })
 
-const getRoles = () => {
-  let roles = {
-    admin: 'Admin',
-    encoder: 'Encoder',
+const fetchRoles = async () => {
+  if (isLoading.value) {
+    return
   }
 
-  return roles
+  const payload: any = {
+    filters: [
+      { column: 'name', operator: '!=', join: 'AND', value: UserLevelEnum.Superadmin },
+      { column: 'name', operator: '!=', join: 'AND', value: UserLevelEnum.Admin },
+    ],
+  }
+
+  const response = await handleVuexApiCall(service.handleFetchRoleList, payload)
+
+  if (response.success) {
+    references.value.roles = response.data.results.map((item) => item.name)
+  } else {
+    const error = response?.body?.message
+    notyf.error(error)
+  }
+
+  isLoading.value = false
 }
 
 const mappings = (data: any) => {
@@ -199,9 +224,10 @@ const isLoading = computed(() => {
   return props.loading
 })
 
-onMounted(() => {
-  roleList.value = getRoles()
-  sexList.value = {
+onMounted(async () => {
+  await fetchRoles()
+
+  references.value.sex = {
     male: 'Male',
     female: 'Female',
   }
@@ -405,7 +431,7 @@ watch(
                       v-model="field.value"
                       v-bind="field"
                       :placeholder="t('info.select_your_roles')"
-                      :options="roleList"
+                      :options="references.roles"
                       :disabled="isLoading"
                       mode="tags"
                       :searchable="true"
@@ -555,7 +581,7 @@ watch(
                     <Multiselect
                       v-model="field.value"
                       v-bind="field"
-                      :options="sexList"
+                      :options="references.sex"
                       :disabled="isLoading"
                       :searchable="true"
                     />

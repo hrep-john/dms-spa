@@ -3,4 +3,5 @@ export default {
   Updated: 'updated',
   Deleted: 'deleted',
   Downloaded: 'downloaded',
+  Viewed: 'viewed',
 }

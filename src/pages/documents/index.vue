@@ -1,3 +1,9 @@
+<route lang="yaml">
+meta:
+  permissionsAllowed:
+    - 'Document: View List'
+</route>
+
 <script setup lang="ts">
 /**
  * This is a Vue Component that will be
@@ -22,11 +28,16 @@ import documentServices from '/@src/stores/documents'
 import udfServices from '/@src/stores/udfs'
 import ModuleEnum from '/@src/enums/module'
 import UdfEnum from '/@src/enums/udf'
-import { handleVuexApiCall, createTempDownloadBtnLink } from '/@src/utils/helper'
+import {
+  handleVuexApiCall,
+  createTempDownloadBtnLink,
+  doesUserCan,
+  toDateString,
+} from '/@src/utils/helper'
 import { useUserSession } from '/@src/stores/userSession'
 
 useHead({
-  title: `Document List - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `Document List | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 
 const userSession = useUserSession()
@@ -94,7 +105,7 @@ const user = computed(() => {
 })
 
 const buildFilters = () => {
-  const tenantFilter = `(tenant_id = ${user.value.tenant_id})`
+  const tenantFilter = `(tenant_id = ${user.value.tenant_id}) AND (user_access = ${user.value.id})`
   const operator = filtermixins.filterDropdownData.length > 0 ? ' AND ' : ''
   return `${tenantFilter}${operator}${filtermixins.getFormattedFilterDropdownData()}`
 }
@@ -143,6 +154,24 @@ const formatErrors = (errors: any) => {
   }
 
   return errorLists
+}
+
+const formatFilterItemLabel = (filterItem: any) => {
+  let { label, operator, value, type } = filterItem
+
+  if (type === 'date') {
+    if (operator === 'to') {
+      const splittedDates = value.split(' ')
+      const start = toDateString(splittedDates[0])
+      const end = toDateString(splittedDates[2])
+      value = `${start} ${operator} ${end}`
+      operator = 'from '
+    } else {
+      value = toDateString(value)
+    }
+  }
+
+  return `${label} ${operator} ${value}`
 }
 
 const clearRecords = () => {
@@ -216,12 +245,6 @@ const handleOnSelectedDocuments = (selected: []) => {
   selectedDocuments.value = selected
 }
 
-const handleOnPreviewDocument = (id: number) => {
-  previewDocument.value = datagrid.value.data.find((document) => document.id === id)
-
-  panels.setActive('preview-document')
-}
-
 const getDocumentFileName = (id: number) => {
   const item = datagrid.value.data.find((item) => item.id === id)
   return item.filename || ''
@@ -244,10 +267,10 @@ const showDeleteConfirmation = () => {
   deleteConfirm.value = true
 }
 
-onMounted(() => {
+onMounted(async () => {
   window.addEventListener('scroll', handleScroll)
-  initializeFilterOptions()
-  paginate(1, true)
+  await initializeFilterOptions()
+  await paginate(1, true)
 })
 
 onBeforeUnmount(() => {
@@ -268,16 +291,43 @@ const clearSearchRecords = () => {
 }
 
 const handleOnDownloadDocument = async (id: any) => {
+  if (isProcessing.value) {
+    return
+  }
+
   isProcessing.value = true
+
   const payload = { id: id }
   const response = await handleVuexApiCall(service.handleDownloadDocument, payload)
+
+  isProcessing.value = false
 
   if (response.success) {
     setTimeout(() => {
       createTempDownloadBtnLink(response.data.result)
       notyf.success(response.data.message)
-      isProcessing.value = false
     }, 500)
+  } else {
+    const error = response?.body?.message
+    notyf.error(error)
+  }
+}
+
+const handleOnPreviewDocument = async (id: any) => {
+  if (isProcessing.value) {
+    return
+  }
+
+  isProcessing.value = true
+
+  const payload = { id: id }
+  const response = await handleVuexApiCall(service.handlePreviewDocument, payload)
+
+  isProcessing.value = false
+
+  if (response.success) {
+    previewDocument.value = datagrid.value.data.find((document) => document.id === id)
+    panels.setActive('preview-document')
   } else {
     const error = response?.body?.message
     notyf.error(error)
@@ -336,25 +386,28 @@ const initializeFilterOptions = async (initial = false) => {
     return
   }
 
-  try {
-    const payload: any = {
-      filters: [
-        {
-          column: 'entitable_type',
-          operator: '=',
-          join: 'OR',
-          value: ModuleEnum.Document,
-        },
-      ],
-    }
+  isLoading.value = true
 
-    let response = await udfService.handleGetUdfs(payload)
+  const payload: any = {
+    filters: [
+      {
+        column: 'entitable_type',
+        operator: '=',
+        join: 'OR',
+        value: ModuleEnum.Document,
+      },
+    ],
+  }
 
-    formatUdfResults(response.results.data)
+  const response = await handleVuexApiCall(udfService.handleGetUdfs, payload)
 
-    isLoading.value = false
-  } catch (error) {
-    notyf.error(error.response.data.message)
+  isLoading.value = false
+
+  if (response.success) {
+    formatUdfResults(response.data.results.data)
+  } else {
+    const error = response?.body?.message
+    notyf.error(error)
   }
 }
 
@@ -363,6 +416,11 @@ const formatUdfResults = (udfData: any) => {
   let udfLists: any = []
 
   formatted = [
+    {
+      column: 'series_id',
+      name: 'Series ID',
+      type: 'string',
+    },
     {
       column: 'file_extension',
       name: 'File Type',
@@ -391,7 +449,7 @@ const formatUdfResults = (udfData: any) => {
           column: 'formatted_udfs.' + udf.key,
           name: udf.label,
           type: 'dropdown',
-          options: udf.settings.options,
+          options: udf.settings.options.map((option: any) => option.label),
         }
       } else if (udf.type == UdfEnum.Types.Date.value) {
         field = {
@@ -412,10 +470,6 @@ const formatUdfResults = (udfData: any) => {
 
   filter.value.options = filter.value.options.concat(formatted)
   udfs.value = udfLists
-}
-
-const onRemoveFilterDropdownItem = (index: number) => {
-  filtermixins.removeFilterDropdownItem(index)
 }
 
 const onSearchEventHandler = (event: any) => {
@@ -442,6 +496,10 @@ watch(
     onSearchEventHandler(value)
   }
 )
+
+onBeforeUnmount(() => {
+  filtermixins.setFilterDropdownItem([])
+})
 </script>
 
 <template>
@@ -519,7 +577,7 @@ watch(
             </template>
           </Tippy>
 
-          <Tippy placement="top">
+          <Tippy placement="top" v-if="doesUserCan('Document: Delete')">
             <VIconBox
               class="radius-25 mr-1"
               color="primary-grey"
@@ -578,18 +636,17 @@ watch(
 
       <div class="filters" v-if="filtermixins.filterDropdownData.length > 0">
         <VField grouped multiline>
-          <h4 class="is-6 mr-2 is-narrow title">Advanced Search</h4>
+          <h4 class="is-6 mr-2 is-narrow title">Filters:</h4>
           <VControl
             v-for="(filterItem, filterItemKey) in filtermixins.filterDropdownData"
             :key="filterItemKey"
           >
             <VTags addons>
+              <VTag :label="formatFilterItemLabel(filterItem)" color="primary" />
               <VTag
-                :label="`${filterItem.label} is ${filterItem.value}`"
-                color="primary"
-                elevated
+                remove
+                @click="filtermixins.removeFilterDropdownItem(filterItemKey)"
               />
-              <VTag remove @click="onRemoveFilterDropdownItem(filterItemKey)" />
             </VTags>
           </VControl>
         </VField>
@@ -713,7 +770,6 @@ watch(
   align-items: center;
 
   .title {
-    min-width: 140px;
     margin-top: 0.4rem;
   }
 }

@@ -1,8 +1,10 @@
 <route lang="yaml">
 meta:
   rolesAllowed:
-    - superadmin
-    - admin
+    - Superadmin
+    - Admin
+  permissionsAllowed:
+    - 'Settings: Create User Defined Field'
 </route>
 
 <script setup lang="ts">
@@ -32,7 +34,7 @@ const viewWrapper = useViewWrapper()
 viewWrapper.setPageTitle('Add User Defined Field')
 
 useHead({
-  title: `Add User Defined Field - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `Add User Defined Field | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 
 const service = udfService.actions

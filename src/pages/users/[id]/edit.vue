@@ -1,8 +1,10 @@
 <route lang="yaml">
 meta:
   rolesAllowed: 
-    - superadmin
-    - admin
+    - Superadmin
+    - Admin
+  permissionsAllowed:
+    - 'User: Edit User'
 </route>
 
 <script setup lang="ts">
@@ -31,10 +33,10 @@ const router = useRouter()
 const notyf = useNotyf()
 const userSession = useUserSession()
 const viewWrapper = useViewWrapper()
-viewWrapper.setPageTitle('Update User')
+viewWrapper.setPageTitle('Edit User')
 
 useHead({
-  title: `Update User - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `Edit User | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 
 const routeParams = router.currentRoute.value.params
@@ -54,18 +56,18 @@ const breadcrumb = [
     },
   },
   {
-    label: 'Update User',
+    label: 'Edit User',
   },
 ]
 
 const defaultValue = ref()
 
 const handleOnSubmit = async (data: any) => {
-  isLoading.value = true
-
-  if (!isLoading.value) {
+  if (isLoading.value) {
     return
   }
+
+  isLoading.value = true
 
   const payload = {
     id: routeParams.id,
@@ -85,7 +87,11 @@ const handleOnSubmit = async (data: any) => {
   }
 }
 
-onMounted(async () => {
+const fetchDefaultValues = async () => {
+  if (isLoading.value) {
+    return
+  }
+
   isLoading.value = true
 
   const response = await handleVuexApiCall(service.handleShowUser, routeParams.id)
@@ -99,6 +105,10 @@ onMounted(async () => {
     notyf.error(error)
     router.push({ name: 'users' })
   }
+}
+
+onMounted(async () => {
+  await fetchDefaultValues()
 })
 </script>
 
@@ -117,7 +127,7 @@ onMounted(async () => {
       <VProgress size="tiny" v-show="isLoading" />
 
       <UserFormLayout
-        title="Update User"
+        title="Edit User"
         @submit="handleOnSubmit"
         :loading="isLoading"
         :default-value="defaultValue"

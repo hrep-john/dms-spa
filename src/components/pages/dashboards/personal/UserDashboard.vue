@@ -35,6 +35,10 @@ const recentDocuments = computed(() => {
   return props.data.recent_documents || []
 })
 
+const assignedDocuments = computed(() => {
+  return props.data.assigned_documents || []
+})
+
 const getFileIcon = (fileType: any) => {
   const fileTypes = [
     'ai',
@@ -82,11 +86,8 @@ const truncateText = (text: string, extension: string) => {
           </div>
           <div class="user-action">
             <VButtons>
-              <!-- <VButton color="info" icon="feather:clipboard" raised elevated rounded>
-                View Reports
-              </VButton> -->
               <RouterLink :to="{ name: 'documents-add' }">
-                <VButton color="primary" icon="feather:upload" raised elevated rounded>
+                <VButton color="primary" icon="feather:upload" raised rounded>
                   Upload Documents
                 </VButton>
               </RouterLink>
@@ -116,6 +117,44 @@ const truncateText = (text: string, extension: string) => {
               :subtitle="getTimeAgo(document.updated_at)"
               center
               :class="{ 'no-margin': recentDocuments.length === key + 1 }"
+            >
+              <template #icon>
+                <span
+                  class="fiv-viv fiv-size-lg"
+                  :class="'fiv-icon-' + document.extension"
+                  @error.once="(event) => onceImageErrored(event, '150x150')"
+                ></span>
+              </template>
+            </VBlock>
+
+            <DashboardCardPlaceload v-show="isLoading" />
+          </div>
+
+          <VMessage v-else color="info">No recent documents...</VMessage>
+        </div>
+      </div>
+
+      <div class="column is-6">
+        <div class="dashboard-card has-margin-bottom">
+          <div class="card-head">
+            <h3 class="dark-inverted">Recently Assigned To You</h3>
+            <RouterLink
+              v-if="assignedDocuments.length > 0"
+              class="action-link"
+              :to="{ name: 'documents' }"
+            >
+              <span>View All</span>
+            </RouterLink>
+          </div>
+          <div v-if="assignedDocuments.length > 0 || isLoading" class="active-projects">
+            <VBlock
+              v-show="!isLoading"
+              v-for="(document, key) in assignedDocuments"
+              :key="key"
+              :title="truncateText(document.filename, document.extension)"
+              :subtitle="getTimeAgo(document.updated_at)"
+              center
+              :class="{ 'no-margin': assignedDocuments.length === key + 1 }"
             >
               <template #icon>
                 <span

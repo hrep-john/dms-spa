@@ -4,6 +4,7 @@
     "barangay": "Barangay",
     "birthday": "Birthday",
     "city": "City",
+    "column_settings": "Column Settings",
     "confirm": "Confirm",
     "confirm_password": "Confirm Password",
     "continue": "Continue",
@@ -13,6 +14,7 @@
     "date_created": "Date Created",
     "email": "Email",
     "email_address": "Email Address",
+    "filters": "Filters",
     "first_name": "First Name",
     "from": "From",
     "forgot_password": "Forgot Password",
@@ -27,6 +29,9 @@
     "new_password": "New Password",
     "tenant_name": "Tenant Name",
     "password": "Password",
+    "permission": "Permission",
+    "permissions": "Permissions",
+    "query": "Query",
     "record_info": "Record Info",
     "region": "Region",
     "reset_password": "Reset Password",
@@ -78,6 +83,9 @@
     "mobile_number": {
       "format": "The mobile number should follow this format: 09XXXXXXXXX."
     },
+    "module": {
+      "required": "Module is required"
+    },
     "tenant": {
       "required": "Tenant is required"
     },
@@ -85,6 +93,9 @@
       "required": "Password is required",
       "required_login": "Enter your password with at least 6 characters, it will be required to login",
       "minimum": "The password should contains at least 6 characters"
+    },
+    "permission": {
+      "required": "Permission is required"
     },
     "role": {
       "required": "Role is required"
@@ -120,8 +131,9 @@
     "please_login_to_your_account": "Please log in to your account",
     "reset_account_password": "Reset your account password",
     "select_your_gender": "Select your gender",
-    "select_your_tenant": "Select your tenant",
+    "select_your_permissions": "Select your permissions",
     "select_your_roles": "Select your roles",
+    "select_your_tenant": "Select your tenant",
     "your_indentity_has_been_identified": "Your identity has been verified!"
   },
   "error": {

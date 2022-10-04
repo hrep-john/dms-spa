@@ -1,8 +1,10 @@
 <route lang="yaml">
 meta:
   rolesAllowed: 
-    - superadmin
-    - admin
+    - Superadmin
+    - Admin
+  permissionsAllowed:
+    - 'Settings: View Tenant Settings'
 </route>
 
 <script setup lang="ts">
@@ -37,15 +39,15 @@ viewWrapper.setPageTitle('Tenant Settings')
 const isLoading = ref(false)
 
 useHead({
-  title: `Tenant Settings - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `Tenant Settings | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 
 const onSubmitEventHandler = async (data: any) => {
-  isLoading.value = true
-
-  if (!isLoading.value) {
+  if (isLoading.value) {
     return
   }
+
+  isLoading.value = true
 
   const user = JSON.parse(userSession.user)
 
