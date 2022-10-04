@@ -424,6 +424,12 @@ watch(
 
     .form-body {
       padding: 20px 40px 40px;
+
+      .ck-editor-wrapper {
+        .ck-editor__editable {
+          min-height: 500px;
+        }
+      }
     }
   }
 }

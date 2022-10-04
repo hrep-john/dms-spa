@@ -63,7 +63,13 @@
     "release:standard-version": "standard-version"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-basic-styles": "^35.1.0",
     "@ckeditor/ckeditor5-build-classic": "31.1.0",
+    "@ckeditor/ckeditor5-editor-classic": "^35.1.0",
+    "@ckeditor/ckeditor5-essentials": "^35.1.0",
+    "@ckeditor/ckeditor5-link": "^35.1.0",
+    "@ckeditor/ckeditor5-paragraph": "^35.1.0",
+    "@ckeditor/ckeditor5-theme-lark": "^35.1.0",
     "@ckeditor/ckeditor5-vue": "2.0.1",
     "@iconify/iconify": "2.1.0",
     "@mapbox/mapbox-gl-geocoder": "4.7.4",
@@ -94,6 +100,7 @@
     "lodash.debounce": "^4.0.8",
     "mapbox-gl": "2.6.1",
     "markdown-it-emoji": "2.0.0",
+    "moment": "^2.29.4",
     "notyf": "3.10.0",
     "nprogress": "0.2.0",
     "parse-domain": "^7.0.0",

@@ -27,7 +27,11 @@ import ModuleEnum from '/@src/enums/module'
 import documentServices from '/@src/stores/documents'
 import userServices from '/@src/stores/users'
 import udfServices from '/@src/stores/udfs'
-import { handleVuexApiCall, createTempDownloadBtnLink } from '/@src/utils/helper'
+import {
+  handleVuexApiCall,
+  createTempDownloadBtnLink,
+  toDateString,
+} from '/@src/utils/helper'
 import UdfEnum from '/@src/enums/udf'
 import UserLevelEnum from '/@src/enums/userLevel'
 
@@ -76,6 +80,11 @@ const columns = {
   full_name: 'Full Name',
 } as const
 
+const modelConfig = ref({
+  type: 'number',
+  timeAdjust: '00:00:00',
+})
+
 const user = computed(() => {
   if (userSession.user === undefined) {
     return {}
@@ -93,7 +102,7 @@ const submit = async () => {
 
   const payload = {
     id: routeParams.id,
-    user_defined_field: getUdfsValue(),
+    user_defined_field: details.value.user_defined_field,
     allow_user_access: details.value.allow_user_access,
     user_access: users.value.selected,
   }
@@ -106,7 +115,6 @@ const submit = async () => {
   isLoading.value = false
 
   if (response.success) {
-    details.value = response.data.result
     notyf.success(response.data.message)
     router.push({ name: 'documents' })
   } else {
@@ -115,31 +123,14 @@ const submit = async () => {
   }
 }
 
-const getUdfsValue = () => {
-  // format all udfs with date format
-  for (let i = 0; i < udfDates.value.length; i++) {
-    const column = udfDates.value[i]
-    if (
-      details.value.user_defined_field[column] !== null &&
-      details.value.user_defined_field[column] !== ''
-    ) {
-      details.value.user_defined_field[column] = new Date(
-        details.value.user_defined_field[column]
-      )
-        .toISOString()
-        .split('T')[0]
-    }
-  }
-
-  return details.value.user_defined_field
-}
-
 const getUdfs = async (initial = false) => {
   if (isLoading.value && !initial) {
     return
   }
 
-  isLoading.value = true
+  if (!initial) {
+    isLoading.value = true
+  }
 
   const payload: any = {
     filters: [
@@ -149,7 +140,9 @@ const getUdfs = async (initial = false) => {
 
   const response = await handleVuexApiCall(udfService.handleGetAllUdfs, payload)
 
-  isLoading.value = false
+  if (!initial) {
+    isLoading.value = false
+  }
 
   if (response.success) {
     formatUdfResults(response.data.results)
@@ -224,14 +217,18 @@ const getDocumentMetadata = async (initial = false) => {
     return
   }
 
-  isLoading.value = true
+  if (!initial) {
+    isLoading.value = true
+  }
 
   const response = await handleVuexApiCall(
     documentService.handleShowDocumentMetadata,
     routeParams.id
   )
 
-  isLoading.value = false
+  if (!initial) {
+    isLoading.value = false
+  }
 
   if (response.success) {
     details.value = response.data.result
@@ -248,14 +245,18 @@ const getDocumentAuditLogs = async (initial = false) => {
     return
   }
 
-  isLoading.value = true
+  if (!initial) {
+    isLoading.value = true
+  }
 
   const response = await handleVuexApiCall(
     documentService.handleGetDocumentAuditLogs,
     routeParams.id
   )
 
-  isLoading.value = false
+  if (!initial) {
+    isLoading.value = false
+  }
 
   if (response.success) {
     auditLogs.value = response.data.results
@@ -286,9 +287,13 @@ const handleOnDownloadDocument = async (id: any) => {
   }
 }
 
-const getUserLists = async () => {
+const getUserLists = async (initial = false) => {
   if (isLoading.value) {
     return
+  }
+
+  if (!initial) {
+    isLoading.value = true
   }
 
   const payload: any = {
@@ -304,21 +309,27 @@ const getUserLists = async () => {
 
   const response = await handleVuexApiCall(userService.handleFetchUserList, payload)
 
+  if (!initial) {
+    isLoading.value = false
+  }
+
   if (response.success) {
     users.value.options = formatDropdownOptions(response.data.results)
   } else {
     const error = response?.body?.message
     notyf.error(error)
   }
-
-  isLoading.value = false
 }
 
 onMounted(async () => {
+  isLoading.value = true
+
   await getUdfs(true)
   await getDocumentMetadata(true)
-  await getUserLists()
+  await getUserLists(true)
   await getDocumentAuditLogs(true)
+
+  isLoading.value = false
 })
 </script>
 
@@ -530,6 +541,8 @@ onMounted(async () => {
                             v-model="details.user_defined_field[udf.column]"
                             color="green"
                             trim-weeks
+                            timezone="UTC"
+                            :model-config="modelConfig"
                           >
                             <template #default="{ inputValue, inputEvents }">
                               <VField>

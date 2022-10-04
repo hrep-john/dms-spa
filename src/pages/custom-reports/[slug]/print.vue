@@ -19,13 +19,14 @@ meta:
 
 import { useHead } from '@vueuse/head'
 import { useViewWrapper } from '/@src/stores/viewWrapper'
-import { onMounted, onBeforeUnmount, ref, computed, watch } from 'vue'
+import { onMounted, onBeforeUnmount, ref, computed, watch, onBeforeMount } from 'vue'
 import { useNotyf } from '/@src/composable/useNotyf'
 import customReportService from '/@src/stores/customReports'
 import debounce from 'lodash.debounce'
 import { useRouter } from 'vue-router'
 import { handleVuexApiCall, doesUserCan } from '/@src/utils/helper'
 import { useFilter } from '/@src/stores/filter'
+import moment from 'moment'
 
 useHead({
   title: `Custom Report | ${import.meta.env.VITE_PROJECT_NAME}`,
@@ -50,6 +51,8 @@ const filters = ref({
   options: [],
 })
 
+const date = ref('')
+
 const fetchCustomReport = async (page = 1) => {
   isLoading.value = true
 
@@ -62,8 +65,12 @@ const fetchCustomReport = async (page = 1) => {
 
   const response = await handleVuexApiCall(service.handleShowCustomReport, payload)
 
+  isLoading.value = false
+
   if (response.success) {
     const formatted = formatData(response.data.results.data)
+    const currentMeta = datatable.value.meta
+
     datatable.value.data = datatable.value.data.concat(formatted)
     datatable.value.meta = response.data.results.meta
     info.value = response.data.results.info
@@ -73,12 +80,18 @@ const fetchCustomReport = async (page = 1) => {
       JSON.parse(JSON.parse(info.value.format).column_settings)
     )
     filters.value.options = JSON.parse(JSON.parse(info.value.format).filters)
+
+    if (currentMeta.current_page !== datatable.value.meta.last_page) {
+      loadMore()
+    } else {
+      setTimeout(() => {
+        window.print()
+      }, 500)
+    }
   } else {
     const error = response?.body?.message
     notyf.error(error)
   }
-
-  isLoading.value = false
 }
 
 const buildColumnSettings = (columnSettings: any) => {
@@ -93,7 +106,7 @@ const buildColumnSettings = (columnSettings: any) => {
 
 const buildFilters = () => {
   const columns = ['name', 'updated_at']
-  let filters: any = []
+  let filters = []
 
   columns.forEach((column) => {
     if (search.value != '') {
@@ -106,23 +119,7 @@ const buildFilters = () => {
     }
   })
 
-  const clone = JSON.parse(JSON.stringify(filtermixins.getFilterDropdownData()))
-
-  let filterDropdownData = formatFilterValues(clone)
-
-  filters = filters.concat(filterDropdownData)
-
-  return filters
-}
-
-const formatFilterValues = (filters: any) => {
-  let formatted: any = []
-  filters = filters.forEach((filter) => {
-    filter.value = filter.value.slice(1, -1)
-    formatted.push(filter)
-  })
-
-  return formatted
+  filters = filtermixins.getFilterDropdownData()
 
   return filters
 }
@@ -164,12 +161,17 @@ const getSelectedRow = (id: any) => {
   return row?.name
 }
 
-const print = () => {
-  window.open(`${routeParams.slug}/print`, '_blank')
-}
+onBeforeMount(() => {
+  notyf.dismissAll()
+})
 
-onMounted(() => {
-  fetchCustomReport()
+onMounted(async () => {
+  date.value = moment().format('MMMM D, YYYY')
+  await fetchCustomReport()
+
+  window.onafterprint = () => {
+    window.close()
+  }
 })
 
 watch(
@@ -192,81 +194,72 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <SidebarLayout default-sidebar="reports">
-    <!-- Content Wrapper -->
-    <div class="page-content-inner">
-      <!--
+  <!-- <SidebarLayout default-sidebar="reports"> -->
+  <!-- Content Wrapper -->
+  <VLoader size="xl" v-show="isLoading" :active="true" class="h-screen" />
+
+  <div class="page-content-inner print">
+    <!--
           Page content goes here
 
           You can see pages content samples from 
           files in /src/components/pages directory
         -->
-      <div class="list-flex-toolbar flex-list-v1">
-        <VField>
-          <VControl icon="feather:search">
-            <input
-              v-model="search"
-              class="input custom-text-filter"
-              placeholder="Search..."
-            />
-          </VControl>
-        </VField>
 
-        <Tippy placement="top">
-          <FilterDropdown :filters="filters.options" :right="false" />
-          <template #content>
-            <div class="v-popover-content is-text">
-              <div class="popover-head">
-                <h4 class="dark-inverted">Advanced Search</h4>
-              </div>
-            </div>
-          </template>
-        </Tippy>
+    <header>
+      <img class="logo" :src="'/images/logos/hrep-logo.png'" alt="" />
+      <h3>Legal Affairs Department</h3>
+      <h3 class="is-bold">DOCUMENTS PROCESSED</h3>
+      <h3>{{ date }}</h3>
+    </header>
 
-        <VButtons>
-          <VButton color="info" icon="fas fa-print" @click="print"> Print </VButton>
-        </VButtons>
-      </div>
-
-      <div class="filters" v-if="filtermixins.filterDropdownData.length > 0">
-        <VField grouped multiline>
-          <h4 class="is-6 mr-2 is-narrow title">Filters:</h4>
-          <VControl
-            v-for="(filterItem, filterItemKey) in filtermixins.filterDropdownData"
-            :key="filterItemKey"
-          >
-            <VTags addons>
-              <VTag
-                :label="`${filterItem.label} is ${filterItem.value}`"
-                color="primary"
-              />
-              <VTag
-                remove
-                @click="filtermixins.removeFilterDropdownItem(filterItemKey)"
-              />
-            </VTags>
-          </VControl>
-        </VField>
-      </div>
-
-      <FlexPaginationList
-        :is-loading="isLoading"
-        :datatable="datatable"
-        :columns="columnSettings"
-        @paginate="fetchCustomReport"
-      />
-    </div>
-  </SidebarLayout>
+    <table v-if="datatable.data.length > 0" class="table is-striped is-fullwidth mt-2">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th v-for="(column, key) in columnSettings" :key="key" scope="col">
+            {{ column }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(list, listKey) in datatable.data" :key="listKey">
+          <td>{{ listKey + 1 }}</td>
+          <td v-for="(column, key) in columnSettings" :key="key">{{ list[key] }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
 
 <style lang="scss">
-.filters {
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
+.h-screen {
+  height: 100vh;
+}
 
-  .title {
-    margin-top: 0.4rem;
+.print {
+  background-color: var(--white);
+
+  header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    img.logo {
+      width: 60px;
+      height: 60px;
+    }
+  }
+
+  .filters {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+
+    .title {
+      margin-top: 0.4rem;
+    }
   }
 }
 </style>

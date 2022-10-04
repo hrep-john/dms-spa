@@ -124,7 +124,7 @@ const loadMore = () => {
               <div
                 v-for="(item, index) in datatable.data"
                 :key="index"
-                class="flex-table-item cursor-pointer"
+                class="flex-table-item"
                 @dblclick="onClickUpdate(item.id)"
               >
                 <VFlexTableCell :column="{ align: 'start' }">

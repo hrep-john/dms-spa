@@ -23,9 +23,10 @@ export const useFilter = defineStore('filter', () => {
     let outerGroup = []
 
     Object.keys(sortedFilters).forEach((key) => {
-      let innerGroup = sortedFilters[key].map(
-        (filter) => `${filter.field} ${filter.operator} \'${filter.value}\'`
-      )
+      let innerGroup = sortedFilters[key].map((filter) => {
+        let operator = filter.operator === 'to' ? '' : ` ${filter.operator}`
+        return `${filter.field} ${operator} ${filter.value}`
+      })
       innerGroup = innerGroup.join(' OR ')
       outerGroup.push(`(${innerGroup})`)
     })

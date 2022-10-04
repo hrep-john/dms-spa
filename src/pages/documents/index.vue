@@ -32,6 +32,7 @@ import {
   handleVuexApiCall,
   createTempDownloadBtnLink,
   doesUserCan,
+  toDateString,
 } from '/@src/utils/helper'
 import { useUserSession } from '/@src/stores/userSession'
 
@@ -155,6 +156,24 @@ const formatErrors = (errors: any) => {
   return errorLists
 }
 
+const formatFilterItemLabel = (filterItem: any) => {
+  let { label, operator, value, type } = filterItem
+
+  if (type === 'date') {
+    if (operator === 'to') {
+      const splittedDates = value.split(' ')
+      const start = toDateString(splittedDates[0])
+      const end = toDateString(splittedDates[2])
+      value = `${start} ${operator} ${end}`
+      operator = 'from '
+    } else {
+      value = toDateString(value)
+    }
+  }
+
+  return `${label} ${operator} ${value}`
+}
+
 const clearRecords = () => {
   datagrid.value.data = []
   datagrid.value.meta = {}
@@ -226,12 +245,6 @@ const handleOnSelectedDocuments = (selected: []) => {
   selectedDocuments.value = selected
 }
 
-const handleOnPreviewDocument = (id: number) => {
-  previewDocument.value = datagrid.value.data.find((document) => document.id === id)
-
-  panels.setActive('preview-document')
-}
-
 const getDocumentFileName = (id: number) => {
   const item = datagrid.value.data.find((item) => item.id === id)
   return item.filename || ''
@@ -278,16 +291,43 @@ const clearSearchRecords = () => {
 }
 
 const handleOnDownloadDocument = async (id: any) => {
+  if (isProcessing.value) {
+    return
+  }
+
   isProcessing.value = true
+
   const payload = { id: id }
   const response = await handleVuexApiCall(service.handleDownloadDocument, payload)
+
+  isProcessing.value = false
 
   if (response.success) {
     setTimeout(() => {
       createTempDownloadBtnLink(response.data.result)
       notyf.success(response.data.message)
-      isProcessing.value = false
     }, 500)
+  } else {
+    const error = response?.body?.message
+    notyf.error(error)
+  }
+}
+
+const handleOnPreviewDocument = async (id: any) => {
+  if (isProcessing.value) {
+    return
+  }
+
+  isProcessing.value = true
+
+  const payload = { id: id }
+  const response = await handleVuexApiCall(service.handlePreviewDocument, payload)
+
+  isProcessing.value = false
+
+  if (response.success) {
+    previewDocument.value = datagrid.value.data.find((document) => document.id === id)
+    panels.setActive('preview-document')
   } else {
     const error = response?.body?.message
     notyf.error(error)
@@ -377,6 +417,11 @@ const formatUdfResults = (udfData: any) => {
 
   formatted = [
     {
+      column: 'series_id',
+      name: 'Series ID',
+      type: 'string',
+    },
+    {
       column: 'file_extension',
       name: 'File Type',
       type: 'string',
@@ -404,7 +449,7 @@ const formatUdfResults = (udfData: any) => {
           column: 'formatted_udfs.' + udf.key,
           name: udf.label,
           type: 'dropdown',
-          options: udf.settings.options,
+          options: udf.settings.options.map((option: any) => option.label),
         }
       } else if (udf.type == UdfEnum.Types.Date.value) {
         field = {
@@ -591,17 +636,13 @@ onBeforeUnmount(() => {
 
       <div class="filters" v-if="filtermixins.filterDropdownData.length > 0">
         <VField grouped multiline>
-          <h4 class="is-6 mr-2 is-narrow title">Advanced Search</h4>
+          <h4 class="is-6 mr-2 is-narrow title">Filters:</h4>
           <VControl
             v-for="(filterItem, filterItemKey) in filtermixins.filterDropdownData"
             :key="filterItemKey"
           >
             <VTags addons>
-              <VTag
-                :label="`${filterItem.label} is ${filterItem.value}`"
-                color="primary"
-                elevated
-              />
+              <VTag :label="formatFilterItemLabel(filterItem)" color="primary" />
               <VTag
                 remove
                 @click="filtermixins.removeFilterDropdownItem(filterItemKey)"
@@ -729,7 +770,6 @@ onBeforeUnmount(() => {
   align-items: center;
 
   .title {
-    min-width: 140px;
     margin-top: 0.4rem;
   }
 }

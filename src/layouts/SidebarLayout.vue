@@ -51,6 +51,14 @@ const isAdmin = computed(() => {
   return isSuperadmin.value || roles.includes('admin')
 })
 
+const customReports = computed(() => {
+  const customReports = userSession.customReports
+    ? JSON.parse(userSession.customReports)
+    : []
+
+  return customReports
+})
+
 /**
  * watchPostEffect callback will be executed each time dependent reactive values has changed
  */
@@ -407,6 +415,7 @@ watch(
           @close="isDesktopSidebarOpen = false"
         />
         <ReportsSubsidebar
+          :custom-reports="customReports"
           v-else-if="isDesktopSidebarOpen && activeMobileSubsidebar === 'reports'"
           @close="isDesktopSidebarOpen = false"
         />

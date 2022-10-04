@@ -23,6 +23,7 @@ const dropdown = ref(null)
 
 const selectedField = ref(null)
 const selectedValue = ref(null)
+const selectedOperator = ref(null)
 
 const fields = () => {
   const fields = {}
@@ -32,6 +33,42 @@ const fields = () => {
   })
 
   return fields
+}
+
+const operators = computed(() => {
+  let operators = {}
+
+  props.filters.forEach((filter) => {
+    if (filter.type === 'string') {
+      operators[filter.column] = {
+        '=': 'equals',
+        '!=': 'not equals',
+      }
+    } else if (filter.type === 'date') {
+      operators[filter.column] = {
+        '=': 'equals',
+        '!=': 'not equals',
+        to: 'date range',
+      }
+    } else {
+      operators[filter.column] = {
+        '=': 'equals',
+        '!=': 'not equals',
+        '>=': 'greater than or equal',
+        '>': 'greater than',
+        '>=': 'less than or equal',
+        '>': 'less than',
+      }
+    }
+  })
+
+  return selectedField.value === null
+    ? ['=', '>=', '>', '<=', '<', '!=']
+    : operators[selectedField.value]
+})
+
+const onChangeFieldHandler = () => {
+  selectedOperator.value = null
 }
 
 const getSelectedFilter = () => {
@@ -47,11 +84,27 @@ const handleOnChangeFilter = (value: any) => {
 }
 
 const onAddFilterItem = () => {
+  const selectedFilter = props.filters.find(
+    (filter) => filter.column === selectedField.value
+  )
+
+  let value = `\"${selectedValue.value}\"`
+
+  if (selectedFilter.type === 'date') {
+    if (selectedOperator.value === 'to') {
+      value = `${selectedValue.value.start} TO ${selectedValue.value.end}`
+    } else {
+      value = `${selectedValue.value}`
+    }
+  }
+
   const filter = {
     field: selectedField.value,
-    label: props.filters.find((filter) => filter.column === selectedField.value)?.name,
-    operator: '=',
-    value: selectedValue.value,
+    label: selectedFilter.name,
+    type: selectedFilter.type,
+    join: selectedFilter.join,
+    operator: selectedOperator.value,
+    value,
   }
 
   filtermixins.setFilterDropdownItem(filter)
@@ -59,6 +112,7 @@ const onAddFilterItem = () => {
   // Increment counter to re-render and reset the component data
   counter.value++
   selectedField.value = null
+  selectedOperator.value = null
   selectedValue.value = null
   dropdown.value.close()
 }
@@ -86,7 +140,20 @@ onMounted(() => {})
               :options="fields()"
               :searchable="true"
               v-model="selectedField"
+              @change="onChangeFieldHandler"
               placeholder="Select a field"
+            />
+          </div>
+
+          <div class="column is-12">
+            <label> Operator: </label>
+
+            <Multiselect
+              :options="operators"
+              :searchable="true"
+              :disabled="selectedField === null"
+              v-model="selectedOperator"
+              placeholder="Select a operator"
             />
           </div>
 
@@ -111,6 +178,7 @@ onMounted(() => {})
             <FilterDropdownItem
               :filter="filter"
               :filter-key="key"
+              :selected-operator="selectedOperator"
               :key="`${key}__${counter}`"
               @search="onAddFilterItem"
               @change="handleOnChangeFilter"
@@ -123,7 +191,12 @@ onMounted(() => {})
               class="has-fullwidth mb-2"
               raised
               @click="onAddFilterItem"
-              :disabled="selectedField === null || selectedValue === null"
+              :disabled="
+                selectedField === null ||
+                selectedOperator === null ||
+                selectedValue === null ||
+                selectedValue === ''
+              "
             >
               <span class="icon">
                 <i aria-hidden="true" class="fas fa-plus"></i>
