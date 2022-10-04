@@ -5,6 +5,7 @@ import { useNotyf } from '/@src/composable/useNotyf'
 import { useUserSession } from '/@src/stores/userSession'
 import { handleVuexApiCall } from '/@src/utils/helper'
 import roleService from '/@src/stores/roles'
+import UserLevelEnum from '/@src/enums/userLevel'
 
 import { Field, useForm } from 'vee-validate'
 import { useI18n } from 'vue-i18n'
@@ -155,7 +156,14 @@ const fetchRoles = async () => {
     return
   }
 
-  const response = await handleVuexApiCall(service.handleFetchRoleList, null)
+  const payload: any = {
+    filters: [
+      { column: 'name', operator: '!=', join: 'AND', value: UserLevelEnum.Superadmin },
+      { column: 'name', operator: '!=', join: 'AND', value: UserLevelEnum.Admin },
+    ],
+  }
+
+  const response = await handleVuexApiCall(service.handleFetchRoleList, payload)
 
   if (response.success) {
     references.value.roles = response.data.results.map((item) => item.name)

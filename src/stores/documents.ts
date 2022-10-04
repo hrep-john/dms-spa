@@ -50,6 +50,12 @@ const actions = {
     return response.data
   },
 
+  async handlePreviewDocument(payload: any) {
+    const response = await api.post(`api/${module}/preview`, payload)
+
+    return response.data
+  },
+
   async handleDeleteDocument(payload: any) {
     const id = payload.id
     delete payload.id

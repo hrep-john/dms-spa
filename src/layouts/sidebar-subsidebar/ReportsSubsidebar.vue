@@ -1,8 +1,28 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useUserSession } from '/@src/stores/userSession'
+import { groupBy } from '/@src/utils/helper'
 
+const userSession = useUserSession()
 const openSubsidebarLinks = ref('')
 const emit = defineEmits(['close'])
+
+const props = defineProps({
+  customReports: {
+    type: Array,
+    default: [],
+  },
+})
+
+const isSuperadmin = computed(() => {
+  const roles = userSession.roles ? JSON.parse(userSession.roles) : []
+
+  return roles.includes('superadmin')
+})
+
+const customReports = computed(() => {
+  return groupBy(props.customReports || [], 'module')
+})
 </script>
 
 <template>
@@ -21,25 +41,32 @@ const emit = defineEmits(['close'])
       </div>
     </div>
     <div class="inner" data-simplebar>
-      <li>
+      <li v-if="isSuperadmin">
         <RouterLink :to="{ name: 'report-builders' }">Report Builder</RouterLink>
       </li>
 
-      <li class="divider"></li>
+      <li v-if="isSuperadmin" class="divider"></li>
+
       <ul>
-        <VCollapseLinks v-model:open="openSubsidebarLinks" collapse-id="document">
+        <VCollapseLinks
+          v-for="(customModuleReports, module) in customReports"
+          :key="module"
+          v-model:open="openSubsidebarLinks"
+          :collapse-id="module"
+        >
           <template #header>
-            Document
+            {{ module }}
             <i aria-hidden="true" class="iconify" data-icon="feather:chevron-right" />
           </template>
 
-          <RouterLink :to="{ name: 'users' }" class="is-submenu">
+          <RouterLink
+            v-for="(customReport, key) in customModuleReports"
+            :key="key"
+            :to="'/custom-reports/' + customReport.slug"
+            class="is-submenu"
+          >
             <i aria-hidden="true" class="lnir lnir-passport"></i>
-            <span>Sample Report 1</span>
-          </RouterLink>
-          <RouterLink :to="{ name: 'tenants' }" class="is-submenu">
-            <i aria-hidden="true" class="lnir lnir-passport"></i>
-            <span>Sample Report 2</span>
+            <span>{{ customReport.name }}</span>
           </RouterLink>
         </VCollapseLinks>
       </ul>

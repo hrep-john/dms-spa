@@ -72,6 +72,7 @@ const onSubmit = handleSubmit(async (values) => {
     userSession.setToken(response.data.access_token)
     userSession.setRoles(response.data.roles)
     userSession.setPermissions(response.data.permissions)
+    userSession.setCustomReports(response.data.custom_reports)
     userSession.setUser(response.data.user)
 
     notyf.dismissAll()

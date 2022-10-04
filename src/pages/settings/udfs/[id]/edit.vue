@@ -85,7 +85,11 @@ const formatAttributes = (attributes: object) => {
   return attributes
 }
 
-onMounted(async () => {
+const fetchDefaultValues = async () => {
+  if (isLoading.value) {
+    return
+  }
+
   isLoading.value = true
 
   const response = await handleVuexApiCall(service.handleShowUdf, routeParams.id)
@@ -99,6 +103,10 @@ onMounted(async () => {
     notyf.error(error)
     router.push({ name: 'settings-udfs' })
   }
+}
+
+onMounted(async () => {
+  await fetchDefaultValues()
 })
 </script>
 

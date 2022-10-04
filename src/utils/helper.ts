@@ -26,6 +26,15 @@ export const handleVuexApiCall = async (vuexAction, payload) => {
           type: 'error',
         },
       }
+    } else if (err.code === 'ECONNABORTED') {
+      return {
+        success: false,
+        body: {
+          message:
+            'Looks like the server is taking too long to responds. Please contact our technical team for support.',
+          type: 'error',
+        },
+      }
     } else {
       // Throw an error if the error is not an HTTP response
       throw err
@@ -80,4 +89,40 @@ export const isJson = (text: string) => {
   } catch (error) {
     return false
   }
+}
+
+export const toUnixTimestamp = (date: Date) => {
+  const unixTimestamp = Math.floor(date.getTime() / 1000)
+  return unixTimestamp
+}
+
+export const toDateString = (unixTimestamp: any) => {
+  let dateString = ''
+
+  if (unixTimestamp != '' && unixTimestamp !== null) {
+    unixTimestamp = parseInt(unixTimestamp)
+    dateString = new Date(unixTimestamp).toISOString().split('T')[0]
+  }
+
+  return dateString
+}
+
+export const groupBy = (array: Array<string>, key: string) =>
+  array.reduce((hash, obj) => {
+    if (obj[key] === undefined) return hash
+    return Object.assign(hash, { [obj[key]]: (hash[obj[key]] || []).concat(obj) })
+  }, {})
+
+export const humanize = (str: string) => {
+  let i
+  let frags = str.split('_')
+
+  for (i = 0; i < frags.length; i++) {
+    frags[i] = frags[i].charAt(0).toUpperCase() + frags[i].slice(1)
+  }
+  frags.forEach((frag) => {
+    frag = frag.charAt(0).toUpperCase() + frag.slice(1)
+  })
+
+  return frags.join(' ')
 }

@@ -47,6 +47,14 @@ const actions = {
 
     return response.data
   },
+
+  async handleFetchUserList(payload: any) {
+    const response = await api.get(`api/users/list`, {
+      params: payload,
+    })
+
+    return response.data
+  },
 }
 
 export default { actions }

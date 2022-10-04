@@ -900,6 +900,12 @@ select {
   }
 }
 
+.filepond--wrapper .filepond--list .filepond--item {
+  .filepond--file-info,
+  .filepond--file-status {
+    color: var(--white);
+  }
+}
 /* ==========================================================================
 10. Filepond Dark mode
 ========================================================================== */

@@ -25,6 +25,7 @@ declare module 'vue' {
     FilterItem: typeof import('./src/components/partials/filters/FilterItem.vue')['default']
     FilterModal: typeof import('./src/components/partials/filters/FilterModal.vue')['default']
     FlexListV1: typeof import('./src/components/pages/layouts/layouts/flex-list/FlexListV1.vue')['default']
+    FlexPaginationList: typeof import('./src/components/pages/layouts/layouts/flex-list/FlexPaginationList.vue')['default']
     FlexTableDropdown: typeof import('./src/components/partials/dropdowns/FlexTableDropdown.vue')['default']
     LandingLayout: typeof import('./src/layouts/LandingLayout.vue')['default']
     LanguagesPanel: typeof import('./src/components/partials/panels/LanguagesPanel.vue')['default']

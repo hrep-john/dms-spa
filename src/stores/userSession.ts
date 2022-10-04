@@ -10,6 +10,7 @@ export const useUserSession = defineStore('userSession', () => {
   const token = useStorage('token', '')
   const roles = useStorage('roles', '')
   const permissions = useStorage('permissions', '')
+  const customReports = useStorage('customReports', '')
 
   const user = useStorage('user', '')
   const loading = ref(true)
@@ -32,6 +33,10 @@ export const useUserSession = defineStore('userSession', () => {
     permissions.value = JSON.stringify(newPermissions)
   }
 
+  function setCustomReports(newCustomReports: string) {
+    customReports.value = JSON.stringify(newCustomReports)
+  }
+
   function setLoading(newLoading: boolean) {
     loading.value = newLoading
   }
@@ -40,6 +45,7 @@ export const useUserSession = defineStore('userSession', () => {
     token.value = undefined
     roles.value = undefined
     permissions.value = undefined
+    customReports.value = undefined
     user.value = undefined
   }
 
@@ -47,6 +53,7 @@ export const useUserSession = defineStore('userSession', () => {
     user,
     roles,
     permissions,
+    customReports,
     token,
     isLoggedIn,
     loading,
@@ -54,6 +61,7 @@ export const useUserSession = defineStore('userSession', () => {
     setUser,
     setRoles,
     setPermissions,
+    setCustomReports,
     setToken,
     setLoading,
   } as const
