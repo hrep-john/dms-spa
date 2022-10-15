@@ -89,6 +89,10 @@ const requiredFields = computed(() => {
       label: 'Last Modified',
       value: props?.data?.updated_at,
     },
+    {
+      label: 'Series Id',
+      value: props?.data?.series_id,
+    },
   ]
 })
 

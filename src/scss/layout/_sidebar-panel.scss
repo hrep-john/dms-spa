@@ -172,8 +172,10 @@
       li {
         height: 36px;
         display: flex;
+        flex-direction: column;
         justify-content: flex-start;
         align-items: center;
+        padding-top: 0.5rem;
         border-left: 2px solid transparent;
         cursor: pointer;
 
@@ -295,7 +297,8 @@
             overflow: hidden;
 
             li {
-              height: 32px;
+              height: unset;
+
               font-family: var(--font);
 
               &.is-active,
@@ -316,6 +319,7 @@
                 align-items: center;
                 padding-left: 32px;
                 font-size: 0.9rem;
+                margin-bottom: 0.5rem;
 
                 &.is-active,
                 .router-link-exact-active {

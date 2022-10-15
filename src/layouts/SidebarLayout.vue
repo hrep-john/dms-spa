@@ -148,7 +148,7 @@ watch(
             </template>
           </Tippy>
         </li>
-        <li v-if="isAdmin">
+        <li v-if="doesUserCan('User: View List')">
           <Tippy placement="right">
             <RouterLink :to="{ name: 'users' }">
               <i
@@ -279,7 +279,7 @@ watch(
             </template>
           </Tippy>
         </li>
-        <li v-if="isAdmin && doesUserCan('User: View List')">
+        <li v-if="doesUserCan('User: View List')">
           <Tippy placement="right">
             <RouterLink :to="{ name: 'users' }">
               <i
@@ -301,7 +301,7 @@ watch(
             </template>
           </Tippy>
         </li>
-        <li v-if="isAdmin && doesUserCan('Role: View List')">
+        <li v-if="doesUserCan('Role: View List')">
           <Tippy placement="right">
             <RouterLink :to="{ name: 'roles' }">
               <i

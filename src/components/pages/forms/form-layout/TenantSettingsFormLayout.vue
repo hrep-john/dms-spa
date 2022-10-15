@@ -120,7 +120,7 @@ const getConfigItems = () => {
 const resetCounterHandler = () => {
   const config = configItems.value['tenant_document_series_current_counter'].value
 
-  config.value = 0
+  config.value = 1
 }
 
 onMounted(() => {

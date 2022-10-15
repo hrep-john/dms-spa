@@ -26,7 +26,6 @@ import debounce from 'lodash.debounce'
 import { useRouter } from 'vue-router'
 import { handleVuexApiCall, doesUserCan } from '/@src/utils/helper'
 import { useFilter } from '/@src/stores/filter'
-import moment from 'moment'
 
 useHead({
   title: `Custom Report | ${import.meta.env.VITE_PROJECT_NAME}`,
@@ -50,8 +49,6 @@ const columnSettings = ref({})
 const filters = ref({
   options: [],
 })
-
-const date = ref('')
 
 const fetchCustomReport = async (page = 1) => {
   isLoading.value = true
@@ -105,21 +102,7 @@ const buildColumnSettings = (columnSettings: any) => {
 }
 
 const buildFilters = () => {
-  const columns = ['name', 'updated_at']
-  let filters = []
-
-  columns.forEach((column) => {
-    if (search.value != '') {
-      filters.push({
-        column: column,
-        join: 'or',
-        operator: 'LIKE',
-        value: `%${search.value}%`,
-      })
-    }
-  })
-
-  filters = filtermixins.getFilterDropdownData()
+  const filters = printoutTemplate.value.filters
 
   return filters
 }
@@ -161,12 +144,15 @@ const getSelectedRow = (id: any) => {
   return row?.name
 }
 
+const printoutTemplate = computed(() => {
+  return viewWrapper.getPrintoutTemplate()
+})
+
 onBeforeMount(() => {
   notyf.dismissAll()
 })
 
 onMounted(async () => {
-  date.value = moment().format('MMMM D, YYYY')
   await fetchCustomReport()
 
   window.onafterprint = () => {
@@ -208,9 +194,9 @@ onBeforeUnmount(() => {
 
     <header>
       <img class="logo" :src="'/images/logos/hrep-logo.png'" alt="" />
-      <h3>Legal Affairs Department</h3>
-      <h3 class="is-bold">DOCUMENTS PROCESSED</h3>
-      <h3>{{ date }}</h3>
+      <h3>{{ printoutTemplate.headers.first_line }}</h3>
+      <h3 class="is-bold">{{ printoutTemplate.headers.second_line }}</h3>
+      <h3>{{ printoutTemplate.headers.third_line }}</h3>
     </header>
 
     <table v-if="datatable.data.length > 0" class="table is-striped is-fullwidth mt-2">
