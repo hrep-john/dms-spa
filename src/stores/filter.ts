@@ -58,6 +58,10 @@ export const useFilter = defineStore('filter', () => {
     )
   }
 
+  function clearFilterDropdownData() {
+    filterDropdownData.value = []
+  }
+
   return {
     filterData,
     filterDropdownData,
@@ -68,6 +72,7 @@ export const useFilter = defineStore('filter', () => {
     sortedFilterDropdownData,
     getFormattedFilterDropdownData,
     getFilterDropdownData,
+    clearFilterDropdownData,
   } as const
 })
 

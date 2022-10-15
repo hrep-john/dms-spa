@@ -24,8 +24,12 @@ import { useNotyf } from '/@src/composable/useNotyf'
 import customReportService from '/@src/stores/customReports'
 import debounce from 'lodash.debounce'
 import { useRouter } from 'vue-router'
-import { handleVuexApiCall, doesUserCan } from '/@src/utils/helper'
+import { handleVuexApiCall, doesUserCan, toDateString } from '/@src/utils/helper'
 import { useFilter } from '/@src/stores/filter'
+import UdfEnum from '/@src/enums/udf'
+import udfServices from '/@src/stores/udfs'
+import ModuleEnum from '/@src/enums/module'
+import moment from 'moment'
 
 useHead({
   title: `Custom Report | ${import.meta.env.VITE_PROJECT_NAME}`,
@@ -38,6 +42,7 @@ const filtermixins = useFilter()
 viewWrapper.setPageTitle('')
 
 const service = customReportService.actions
+const udfService = udfServices.actions
 
 const isLoading = ref(true)
 const search = ref('')
@@ -49,15 +54,19 @@ const columnSettings = ref({})
 const filters = ref({
   options: [],
 })
+const references = ref({
+  filters: [],
+})
 
 const fetchCustomReport = async (page = 1) => {
   isLoading.value = true
+  console.log('currentRoute.value.params.slug', currentRoute.value.params.slug)
 
   const payload = {
     page: page,
     per_page: 10,
     filters: buildFilters(),
-    slug: routeParams.slug,
+    slug: currentRoute.value.params.slug,
   }
 
   const response = await handleVuexApiCall(service.handleShowCustomReport, payload)
@@ -72,13 +81,100 @@ const fetchCustomReport = async (page = 1) => {
     columnSettings.value = buildColumnSettings(
       JSON.parse(JSON.parse(info.value.format).column_settings)
     )
-    filters.value.options = JSON.parse(JSON.parse(info.value.format).filters)
+    filters.value.options = initializeFilters(
+      JSON.parse(JSON.parse(info.value.format).filters)
+    )
   } else {
     const error = response?.body?.message
     notyf.error(error)
   }
 
   isLoading.value = false
+}
+
+const initializeFilters = (filters: any) => {
+  filters.forEach((filter) => {
+    if (filter.type === 'dropdown') {
+      const options = references.value.filters.find(
+        (referenceFilter) => referenceFilter.column === filter.column
+      )?.options
+      filter.options = options
+    }
+  })
+
+  return filters
+}
+
+const initializeFilterOptions = async (initial = false) => {
+  if (isLoading.value && !initial) {
+    return
+  }
+
+  isLoading.value = true
+
+  const payload: any = {
+    filters: [
+      {
+        column: 'entitable_type',
+        operator: '=',
+        join: 'OR',
+        value: ModuleEnum.Document,
+      },
+    ],
+  }
+
+  const response = await handleVuexApiCall(udfService.handleGetUdfs, payload)
+
+  isLoading.value = false
+
+  if (response.success) {
+    formatUdfResults(response.data.results.data)
+  } else {
+    const error = response?.body?.message
+    notyf.error(error)
+  }
+}
+
+const formatUdfResults = (udfData: any) => {
+  let formatted: any = []
+
+  if (udfData.length > 0) {
+    udfData.forEach((udf: any) => {
+      let field = {}
+
+      if (udf.type == UdfEnum.Types.Text.value) {
+        field = {
+          column: udf.key,
+          name: udf.label,
+          type: 'string',
+        }
+      } else if (udf.type == UdfEnum.Types.Number.value) {
+        field = {
+          column: udf.key,
+          name: udf.label,
+          type: 'number',
+        }
+      } else if (udf.type == UdfEnum.Types.Dropdown.value) {
+        field = {
+          column: udf.key,
+          name: udf.label,
+          type: 'dropdown',
+          options: udf.settings.options.map((option: any) => option.label),
+          raw_options: udf.settings.options,
+        }
+      } else if (udf.type == UdfEnum.Types.Date.value) {
+        field = {
+          column: udf.key,
+          name: udf.label,
+          type: 'date',
+        }
+      }
+
+      formatted.push(field)
+    })
+  }
+
+  references.value.filters = filters.value.options.concat(formatted)
 }
 
 const buildColumnSettings = (columnSettings: any) => {
@@ -92,13 +188,13 @@ const buildColumnSettings = (columnSettings: any) => {
 }
 
 const buildFilters = () => {
-  const columns = ['name', 'updated_at']
-  let filters: any = []
+  const columns = filters.value.options.map((filterOption) => filterOption.column)
+  let criteria: any = []
 
   columns.forEach((column) => {
     if (search.value != '') {
-      filters.push({
-        column: column,
+      criteria.push({
+        field: column,
         join: 'or',
         operator: 'LIKE',
         value: `%${search.value}%`,
@@ -110,21 +206,53 @@ const buildFilters = () => {
 
   let filterDropdownData = formatFilterValues(clone)
 
-  filters = filters.concat(filterDropdownData)
+  criteria = criteria.concat(filterDropdownData)
 
-  return filters
+  return criteria
 }
 
 const formatFilterValues = (filters: any) => {
   let formatted: any = []
+
   filters = filters.forEach((filter) => {
-    filter.value = filter.value.slice(1, -1)
-    formatted.push(filter)
+    if (filter.type === 'date' && filter.operator === 'to') {
+      const splittedDates = filter.value.split(' ')
+      // Deep Clone
+      const dateStart = Object.assign({}, filter)
+      const dateEnd = Object.assign({}, filter)
+      dateStart.value = splittedDates[0]
+      dateStart.operator = '>='
+      formatted.push(dateStart)
+      dateEnd.value = splittedDates[2]
+      dateEnd.operator = '<='
+      formatted.push(dateEnd)
+    } else {
+      filter.value = formatFilterRawValue(filter)
+      formatted.push(filter)
+    }
   })
 
   return formatted
+}
 
-  return filters
+const formatFilterRawValue = (filter: any) => {
+  let value = filter.value
+
+  if (filter.type !== 'date') {
+    value = value.slice(1, -1)
+  }
+
+  if (filter.type === 'dropdown') {
+    const referenceFilter: any = references.value.filters.find(
+      (referenceFilter) => referenceFilter.column === filter.field
+    )
+
+    const rawOptions = referenceFilter.raw_options
+
+    value = rawOptions.find((option) => option.label === value)?.id
+  }
+
+  return value
 }
 
 function formatData(data: any) {
@@ -165,11 +293,49 @@ const getSelectedRow = (id: any) => {
 }
 
 const print = () => {
+  const date = moment().format('MMMM D, YYYY')
+
+  viewWrapper.setPrintoutTemplate({
+    headers: {
+      first_line: 'Legal Affairs Department',
+      second_line: info.value.name,
+      third_line: date,
+    },
+    filters: buildFilters(),
+  })
+
   window.open(`${routeParams.slug}/print`, '_blank')
 }
 
-onMounted(() => {
-  fetchCustomReport()
+const formatFilterItemLabel = (filterItem: any) => {
+  let { label, operator, value, type } = filterItem
+
+  if (type === 'date') {
+    if (operator === 'to') {
+      const splittedDates = value.split(' ')
+      const start = toDateString(splittedDates[0])
+      const end = toDateString(splittedDates[2])
+      value = `${start} ${operator} ${end}`
+      operator = 'from '
+    } else {
+      value = toDateString(value)
+    }
+  }
+
+  return `${label} ${operator} ${value}`
+}
+
+const currentRoute = computed(() => {
+  return router.currentRoute.value
+})
+
+const currentRoutePath = computed(() => {
+  return router.currentRoute.value.path
+})
+
+onMounted(async () => {
+  await initializeFilterOptions(true)
+  await fetchCustomReport()
 })
 
 watch(
@@ -183,6 +349,17 @@ watch(
   () => filtermixins.filterDropdownData,
   (value) => {
     searchRecords(value)
+  }
+)
+
+watch(
+  () => [currentRoutePath.value],
+  async (value) => {
+    if (value && typeof value === 'string') {
+      clearRecords()
+      filtermixins.clearFilterDropdownData()
+      await fetchCustomReport()
+    }
   }
 )
 
@@ -236,10 +413,7 @@ onBeforeUnmount(() => {
             :key="filterItemKey"
           >
             <VTags addons>
-              <VTag
-                :label="`${filterItem.label} is ${filterItem.value}`"
-                color="primary"
-              />
+              <VTag :label="formatFilterItemLabel(filterItem)" color="primary" />
               <VTag
                 remove
                 @click="filtermixins.removeFilterDropdownItem(filterItemKey)"

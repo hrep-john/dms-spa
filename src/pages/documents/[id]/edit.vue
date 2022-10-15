@@ -288,7 +288,7 @@ const handleOnDownloadDocument = async (id: any) => {
 }
 
 const getUserLists = async (initial = false) => {
-  if (isLoading.value) {
+  if (isLoading.value && !initial) {
     return
   }
 
@@ -581,7 +581,6 @@ onMounted(async () => {
                           <VRadio
                             v-model="details.allow_user_access"
                             :value="true"
-                            :disabled="isLoading"
                             label="Yes"
                             name="outlined_squared_radio"
                             color="primary"
@@ -590,7 +589,6 @@ onMounted(async () => {
                           <VRadio
                             v-model="details.allow_user_access"
                             :value="false"
-                            :disabled="isLoading"
                             label="No"
                             name="outlined_squared_radio"
                             color="primary"
