@@ -2,9 +2,10 @@
 import { useWindowScroll } from '@vueuse/core'
 import { computed, ref, onMounted, watch } from 'vue'
 import { useNotyf } from '/@src/composable/useNotyf'
-import { handleVuexApiCall } from '/@src/utils/helper'
 import { useUserSession } from '/@src/stores/userSession'
-import tenantServices from '/@src/stores/tenants'
+import { handleVuexApiCall } from '/@src/utils/helper'
+import roleService from '/@src/stores/roles'
+import UserLevelEnum from '/@src/enums/userLevel'
 
 import { Field, useForm } from 'vee-validate'
 import { useI18n } from 'vue-i18n'
@@ -12,6 +13,8 @@ import * as yup from 'yup'
 
 const { t } = useI18n()
 const userSession = useUserSession()
+
+const service = roleService.actions
 
 const props = defineProps({
   errors: {
@@ -99,11 +102,6 @@ let objectSchema = {
     .optional()
     .max(255, t('validation.common.input_field_maximum_length')),
   roles: yup.array().required(t('validation.role.required')),
-  tenant_id: yup
-    .string()
-    .nullable()
-    .required(t('validation.tenant.required'))
-    .max(255, t('validation.common.input_field_maximum_length')),
 }
 
 if (props.isNew) {
@@ -124,10 +122,13 @@ const schema = yup.object(objectSchema)
 
 const notyf = useNotyf()
 const emit = defineEmits(['submit'])
-const tenantService = tenantServices.actions
-const tenants = ref({})
-const roleList = ref(Array())
-const sexList = ref(Array())
+const references = ref({
+  roles: [],
+  sex: {
+    male: 'Male',
+    female: 'Female',
+  },
+})
 
 const { y } = useWindowScroll()
 
@@ -150,25 +151,36 @@ const user = computed(() => {
   return JSON.parse(userSession.user || '')
 })
 
-const getTenantList = async () => {
-  let tenantList = {}
-  tenantList[user.value.tenant_id] = user.value.tenant_name
-  tenants.value = tenantList
-}
-
-const getRoles = () => {
-  let roles = {
-    admin: 'Admin',
-    encoder: 'Encoder',
+const fetchRoles = async () => {
+  if (isLoading.value) {
+    return
   }
 
-  return roles
+  const payload: any = {
+    filters: [
+      { column: 'name', operator: '!=', join: 'AND', value: UserLevelEnum.Superadmin },
+      { column: 'name', operator: '!=', join: 'AND', value: UserLevelEnum.Admin },
+    ],
+  }
+
+  const response = await handleVuexApiCall(service.handleFetchRoleList, payload)
+
+  if (response.success) {
+    references.value.roles = response.data.results.map((item) => item.name)
+  } else {
+    const error = response?.body?.message
+    notyf.error(error)
+  }
+
+  isLoading.value = false
 }
 
 const mappings = (data: any) => {
   if (data.birthday) {
     data.birthday = new Date(data.birthday).toISOString().split('T')[0]
   }
+
+  data.tenant_id = user?.value?.tenant_id
 
   return data
 }
@@ -212,10 +224,10 @@ const isLoading = computed(() => {
   return props.loading
 })
 
-onMounted(() => {
-  getTenantList()
-  roleList.value = getRoles()
-  sexList.value = {
+onMounted(async () => {
+  await fetchRoles()
+
+  references.value.sex = {
     male: 'Male',
     female: 'Female',
   }
@@ -408,41 +420,9 @@ watch(
                 </VField>
               </Field>
             </div>
-          </div>
-        </div>
-
-        <!--Fieldset-->
-        <div class="form-fieldset">
-          <div class="fieldset-heading">
-            <h4>Tenant Info</h4>
-            <p>Tell us about your tenant</p>
-          </div>
-
-          <div class="columns is-multiline">
-            <!--Field-->
-            <div class="column is-6">
-              <Field v-slot="{ field, errorMessage }" name="tenant_id">
-                <VField>
-                  <label>{{ t('label.tenant_name') }}</label>
-                  <VControl :has-error="Boolean(errorMessage)">
-                    <Multiselect
-                      v-model="field.value"
-                      v-bind="field"
-                      :placeholder="t('info.select_your_tenant')"
-                      :options="tenants"
-                      :disabled="isLoading"
-                      :searchable="true"
-                    />
-                    <p v-if="errorMessage" class="help is-danger">
-                      {{ errorMessage }}
-                    </p>
-                  </VControl>
-                </VField>
-              </Field>
-            </div>
 
             <!--Field-->
-            <div class="column is-6">
+            <div class="column is-12">
               <Field v-slot="{ field, errorMessage }" name="roles">
                 <VField>
                   <label>{{ t('label.roles') }}</label>
@@ -451,9 +431,9 @@ watch(
                       v-model="field.value"
                       v-bind="field"
                       :placeholder="t('info.select_your_roles')"
-                      :options="roleList"
+                      :options="references.roles"
                       :disabled="isLoading"
-                      mode="multiple"
+                      mode="tags"
                       :searchable="true"
                     />
                     <p v-if="errorMessage" class="help is-danger">
@@ -601,7 +581,7 @@ watch(
                     <Multiselect
                       v-model="field.value"
                       v-bind="field"
-                      :options="sexList"
+                      :options="references.sex"
                       :disabled="isLoading"
                       :searchable="true"
                     />

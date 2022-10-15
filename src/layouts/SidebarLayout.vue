@@ -6,6 +6,7 @@ import type { SidebarTheme } from '/@src/components/navigation/desktop/Sidebar.v
 import { usePanels } from '/@src/stores/panels'
 import { useViewWrapper } from '/@src/stores/viewWrapper'
 import { useUserSession } from '/@src/stores/userSession'
+import { doesUserCan } from '../utils/helper'
 
 const props = withDefaults(
   defineProps<{
@@ -48,6 +49,14 @@ const isAdmin = computed(() => {
   const roles = userSession.roles ? JSON.parse(userSession.roles) : []
 
   return isSuperadmin.value || roles.includes('admin')
+})
+
+const customReports = computed(() => {
+  const customReports = userSession.customReports
+    ? JSON.parse(userSession.customReports)
+    : []
+
+  return customReports
 })
 
 /**
@@ -139,7 +148,7 @@ watch(
             </template>
           </Tippy>
         </li>
-        <li v-if="isAdmin">
+        <li v-if="doesUserCan('User: View List')">
           <Tippy placement="right">
             <RouterLink :to="{ name: 'users' }">
               <i
@@ -156,6 +165,29 @@ watch(
                 </div>
                 <div class="popover-body">
                   <p>Manage Users.</p>
+                </div>
+              </div>
+            </template>
+          </Tippy>
+        </li>
+        <li>
+          <Tippy placement="right">
+            <a
+              aria-label="Manage Reports"
+              :class="[activeMobileSubsidebar === 'reports' && 'is-active']"
+              tabindex="0"
+              @keydown.space.prevent="activeMobileSubsidebar = 'reports'"
+              @click="activeMobileSubsidebar = 'reports'"
+            >
+              <i aria-hidden="true" class="iconify" data-icon="feather:file-text"></i>
+            </a>
+            <template #content>
+              <div class="v-popover-content is-text">
+                <div class="popover-head">
+                  <h4 class="dark-inverted">Reports</h4>
+                </div>
+                <div class="popover-body">
+                  <p>Manage Reports.</p>
                 </div>
               </div>
             </template>
@@ -191,6 +223,10 @@ watch(
         <DashboardsMobileSubsidebar
           v-if="isMobileSidebarOpen && activeMobileSubsidebar === 'dashboard'"
         />
+        <ReportsMobileSubsidebar
+          v-else-if="isMobileSidebarOpen && activeMobileSubsidebar === 'reports'"
+          @close="isMobileSidebarOpen = false"
+        />
       </KeepAlive>
     </Transition>
 
@@ -221,7 +257,7 @@ watch(
             </template>
           </Tippy>
         </li>
-        <li>
+        <li v-if="doesUserCan('Document: View List')">
           <Tippy placement="right">
             <RouterLink :to="{ name: 'documents' }">
               <i
@@ -243,7 +279,7 @@ watch(
             </template>
           </Tippy>
         </li>
-        <li v-if="isAdmin">
+        <li v-if="doesUserCan('User: View List')">
           <Tippy placement="right">
             <RouterLink :to="{ name: 'users' }">
               <i
@@ -260,6 +296,55 @@ watch(
                 </div>
                 <div class="popover-body">
                   <p>Manage Users.</p>
+                </div>
+              </div>
+            </template>
+          </Tippy>
+        </li>
+        <li v-if="doesUserCan('Role: View List')">
+          <Tippy placement="right">
+            <RouterLink :to="{ name: 'roles' }">
+              <i
+                aria-hidden="true"
+                class="fas fa-user-cog iconify sidebar-svg"
+                @click="activeMobileSubsidebar = 'roles'"
+              ></i>
+            </RouterLink>
+            <template #content>
+              <div class="v-popover-content is-text">
+                <div class="popover-head">
+                  <h4 class="dark-inverted">Roles</h4>
+                </div>
+                <div class="popover-body">
+                  <p>Manage Roles.</p>
+                </div>
+              </div>
+            </template>
+          </Tippy>
+        </li>
+        <li>
+          <Tippy placement="right">
+            <a
+              :class="[activeMobileSubsidebar === 'reports' && 'is-active']"
+              data-content="Reports"
+              aria-label="Reports"
+              tabindex="0"
+              @keydown.space.prevent="switchSidebar('reports')"
+              @click="switchSidebar('reports')"
+            >
+              <i
+                aria-hidden="true"
+                class="iconify sidebar-svg"
+                data-icon="feather:file-text"
+              ></i>
+            </a>
+            <template #content>
+              <div class="v-popover-content is-text">
+                <div class="popover-head">
+                  <h4 class="dark-inverted">Reports</h4>
+                </div>
+                <div class="popover-body">
+                  <p>Manage Reports.</p>
                 </div>
               </div>
             </template>
@@ -327,6 +412,11 @@ watch(
       <KeepAlive>
         <FilesSubsidebar
           v-if="isDesktopSidebarOpen && activeMobileSubsidebar === 'documents'"
+          @close="isDesktopSidebarOpen = false"
+        />
+        <ReportsSubsidebar
+          :custom-reports="customReports"
+          v-else-if="isDesktopSidebarOpen && activeMobileSubsidebar === 'reports'"
           @close="isDesktopSidebarOpen = false"
         />
       </KeepAlive>

@@ -1,7 +1,7 @@
 <route lang="yaml">
 meta:
   rolesAllowed:
-    - superadmin
+    - Superadmin
 </route>
 
 <script setup lang="ts">
@@ -24,10 +24,10 @@ import { useNotyf } from '/@src/composable/useNotyf'
 import tenantService from '/@src/stores/tenants'
 import debounce from 'lodash.debounce'
 import { useRouter } from 'vue-router'
-import { handleVuexApiCall } from '/@src/utils/helper'
+import { handleVuexApiCall, doesUserCan } from '/@src/utils/helper'
 
 useHead({
-  title: `Tenant List - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `Tenant List | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 
 const router = useRouter()
@@ -210,12 +210,14 @@ watch(
 
         <VButtons>
           <RouterLink :to="{ name: 'tenants-add' }">
-            <VButton color="primary" icon="fas fa-plus" elevated> Add Tenant </VButton>
+            <VButton color="primary" icon="fas fa-plus"> Add Tenant </VButton>
           </RouterLink>
         </VButtons>
       </div>
 
       <FlexListV1
+        :with-edit="doesUserCan('Tenant: Edit Tenant')"
+        :with-delete="doesUserCan('Tenant: Delete Tenant')"
         :is-loading="isLoading"
         :datatable="datatable"
         :columns="columns"

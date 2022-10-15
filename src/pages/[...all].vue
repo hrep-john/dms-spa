@@ -36,7 +36,7 @@ onMounted(() => {
 })
 
 useHead({
-  title: `${t('page-title')} - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `${t('page-title')} | ${import.meta.env.VITE_PROJECT_NAME}`,
   meta: [
     {
       name: 'robots',

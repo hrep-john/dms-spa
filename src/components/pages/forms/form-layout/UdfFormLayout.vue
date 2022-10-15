@@ -294,7 +294,7 @@ watch(
             </div>
 
             <!--Field-->
-            <div class="column is-4">
+            <div class="column is-6">
               <Field v-slot="{ field, errorMessage }" name="entitable_type">
                 <VField>
                   <label>{{ t('label.module') }}</label>
@@ -315,12 +315,12 @@ watch(
             </div>
 
             <!--Field-->
-            <div class="column is-2">
+            <!-- <div class="column is-2">
               <VField>
                 <label>{{ t('label.show') }}</label>
                 <VSwitchBlock color="primary" v-model="udfVisibilityValue" />
               </VField>
-            </div>
+            </div> -->
 
             <!--Field-->
             <div class="column is-6">

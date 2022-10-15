@@ -1,8 +1,10 @@
 <route lang="yaml">
 meta:
   rolesAllowed:
-    - superadmin
-    - admin
+    - Superadmin
+    - Admin
+  permissionsAllowed:
+    - 'Settings: View User Defined Field List'
 </route>
 
 <script setup lang="ts">
@@ -25,10 +27,10 @@ import { useNotyf } from '/@src/composable/useNotyf'
 import udfServices from '/@src/stores/udfs'
 import debounce from 'lodash.debounce'
 import { useRouter } from 'vue-router'
-import { handleVuexApiCall } from '/@src/utils/helper'
+import { handleVuexApiCall, doesUserCan } from '/@src/utils/helper'
 
 useHead({
-  title: `User Defined Field List - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `User Defined Field List | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 
 const router = useRouter()
@@ -54,6 +56,19 @@ const columns = {
     align: 'end',
   },
 } as const
+
+const breadcrumb = [
+  {
+    label: 'Settings',
+    icon: 'feather:settings',
+    to: {
+      name: 'settings',
+    },
+  },
+  {
+    label: 'User Defined Field List',
+  },
+]
 
 const paginate = async (page = 1) => {
   isLoading.value = true
@@ -200,6 +215,9 @@ watch(
           You can see pages content samples from 
           files in /src/components/pages directory
         -->
+
+      <VBreadcrumb :items="breadcrumb" separator="arrow" with-icons />
+
       <div class="list-flex-toolbar flex-list-v1">
         <VField>
           <VControl icon="feather:search">
@@ -213,12 +231,14 @@ watch(
 
         <VButtons>
           <RouterLink :to="{ name: 'settings-udfs-add' }">
-            <VButton color="primary" icon="fas fa-plus" elevated> Add UDF </VButton>
+            <VButton color="primary" icon="fas fa-plus"> Add UDF </VButton>
           </RouterLink>
         </VButtons>
       </div>
 
       <FlexListV1
+        :with-edit="doesUserCan('Settings: Edit User Defined Field')"
+        :with-delete="doesUserCan('Settings: Delete User Defined Field')"
         :is-loading="isLoading"
         :datatable="datatable"
         :columns="columns"

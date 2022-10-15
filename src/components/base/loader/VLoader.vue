@@ -52,7 +52,7 @@ const props = withDefaults(defineProps<VLoaderProps>(), {
     align-items: center;
     height: 100%;
     width: 100%;
-    background: var(--white);
+    background: var(--primary);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s;

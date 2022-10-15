@@ -1,3 +1,9 @@
+<route lang="yaml">
+meta:
+  permissionsAllowed:
+    - 'Settings: View Changelogs'
+</route>
+
 <script setup lang="ts">
 /**
  * This is a Vue Component that will be
@@ -18,8 +24,21 @@ const viewWrapper = useViewWrapper()
 viewWrapper.setPageTitle('Changelog')
 
 useHead({
-  title: `Changelog - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `Changelog | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
+
+const breadcrumb = [
+  {
+    label: 'Settings',
+    icon: 'feather:settings',
+    to: {
+      name: 'settings',
+    },
+  },
+  {
+    label: 'Changelog',
+  },
+]
 </script>
 
 <template>
@@ -32,6 +51,8 @@ useHead({
           You can see pages content samples from 
           files in /src/components/pages directory
         -->
+
+      <VBreadcrumb :items="breadcrumb" separator="arrow" with-icons />
 
       <ChangelogTimeline :data="[]" />
     </div>

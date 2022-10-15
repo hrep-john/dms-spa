@@ -99,7 +99,7 @@ const props = defineProps<VViewWrapperProps>()
   width: calc(100% - 80px);
   padding: 0 0 60px;
   margin-left: 80px;
-  background: var(--background-grey);
+  background: var(--background-color);
   transition: all 0.3s; // transition-all test
 
   &.is-pushed-full {

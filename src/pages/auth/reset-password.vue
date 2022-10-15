@@ -15,6 +15,7 @@ import { useUserSession } from '/@src/stores/userSession'
 import { useDarkmode } from '/@src/stores/darkmode'
 import { useNotyf } from '/@src/composable/useNotyf'
 import { handleVuexApiCall } from '/@src/utils/helper'
+import { useTenantSettings } from '/@src/stores/tenantSettings'
 import sleep from '/@src/utils/sleep'
 import authServices from '/@src/stores/auth'
 
@@ -24,6 +25,7 @@ const router = useRouter()
 const notyf = useNotyf()
 const queryParams = router.currentRoute.value.query
 const userSession = useUserSession()
+const tenantSettings = useTenantSettings()
 
 const isPasswordVisible = ref(false)
 const isConfirmPasswordVisible = ref(false)
@@ -127,7 +129,7 @@ onMounted(() => {
 })
 
 useHead({
-  title: `Reset Password - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `Reset Password | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 </script>
 
@@ -135,7 +137,7 @@ useHead({
   <div class="auth-wrapper-inner columns is-gapless">
     <!-- Form section -->
     <div class="column is-5">
-      <div class="hero is-fullheight is-white">
+      <div class="hero is-fullheight is-white left-section">
         <div class="hero-heading">
           <label
             class="dark-mode ml-auto"
@@ -288,19 +290,29 @@ useHead({
     </div>
 
     <!-- Image section (hidden on mobile) -->
-    <div class="column login-column is-7 is-hidden-mobile hero-banner">
+    <div class="column login-column is-7 is-hidden-mobile hero-banner right-section">
       <div class="hero login-hero is-fullheight is-app-grey">
         <div class="hero-body">
           <div class="columns">
             <div class="column is-12">
               <img
                 class="light-image"
-                src="/@src/assets/illustrations/reset-password/background-dark.svg?format=webp"
+                :src="
+                  tenantSettings.getTenantSettings(
+                    'reset-password-placeholder-image',
+                    '/@src/assets/illustrations/reset-password/background-dark.svg?format=webp'
+                  )
+                "
                 alt=""
               />
               <img
                 class="dark-image"
-                src="/@src/assets/illustrations/reset-password/background-light.svg?format=webp"
+                :src="
+                  tenantSettings.getTenantSettings(
+                    'reset-password-placeholder-image',
+                    '/@src/assets/illustrations/reset-password/background-dark.svg?format=webp'
+                  )
+                "
                 alt=""
               />
             </div>
@@ -313,3 +325,23 @@ useHead({
     </div>
   </div>
 </template>
+
+<style lang="scss" scoped>
+.left-section {
+  background: var(--reset-password-left-section-background-color) !important;
+}
+
+.right-section {
+  background: var(--reset-password-right-section-background-color) !important;
+}
+
+.is-dark {
+  .left-section {
+    background: var(--dark-sidebar-light-4) !important;
+  }
+
+  .right-section {
+    background: var(--dark-sidebar-dark-4) !important;
+  }
+}
+</style>

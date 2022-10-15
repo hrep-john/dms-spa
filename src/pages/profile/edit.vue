@@ -18,7 +18,7 @@ const viewWrapper = useViewWrapper()
 viewWrapper.setPageTitle('View Profile')
 
 useHead({
-  title: `View Profile - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `View Profile | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 
 const breadcrumb = [
@@ -38,21 +38,21 @@ const breadcrumb = [
 <template>
   <SidebarLayout>
     <!-- Content Wrapper -->
-  <div class="page-content-inner">
-    <!--Edit Profile-->
-    <div class="account-wrapper">
-      <div class="columns">
-        <!--Navigation-->
-        <div class="column is-8">
-          <RouterView v-slot="{ Component }">
-            <Transition name="translate-page-y" mode="in-out">
-              <component :is="Component" />
-            </Transition>
-          </RouterView>
+    <div class="page-content-inner">
+      <!--Edit Profile-->
+      <div class="account-wrapper">
+        <div class="columns">
+          <!--Navigation-->
+          <div class="column is-8">
+            <RouterView v-slot="{ Component }">
+              <Transition name="translate-page-y" mode="in-out">
+                <component :is="Component" />
+              </Transition>
+            </RouterView>
+          </div>
         </div>
       </div>
     </div>
-  </div>
   </SidebarLayout>
 </template>
 

@@ -1,8 +1,10 @@
 <route lang="yaml">
 meta:
   rolesAllowed: 
-    - superadmin
-    - admin
+    - Superadmin
+    - Admin
+  permissionsAllowed:
+    - 'User: Edit User'
 </route>
 
 <script setup lang="ts">
@@ -31,18 +33,18 @@ const router = useRouter()
 const notyf = useNotyf()
 const userSession = useUserSession()
 const viewWrapper = useViewWrapper()
-viewWrapper.setPageTitle('Update User')
+viewWrapper.setPageTitle('Edit User')
 
 useHead({
-  title: `Update User - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `Edit User | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 
-const routeParams = router.currentRoute.value.params;
+const routeParams = router.currentRoute.value.params
 const service = userService.actions
 const isLoading = ref(false)
 const errors = ref({
   data: [],
-  show: false
+  show: false,
 })
 
 const breadcrumb = [
@@ -54,18 +56,22 @@ const breadcrumb = [
     },
   },
   {
-    label: 'Update User',
+    label: 'Edit User',
   },
 ]
 
 const defaultValue = ref()
 
-const handleOnSubmit = async (data:any) => {
-  isLoading.value = true  
+const handleOnSubmit = async (data: any) => {
+  if (isLoading.value) {
+    return
+  }
+
+  isLoading.value = true
 
   const payload = {
     id: routeParams.id,
-    ...data
+    ...data,
   }
 
   const response = await handleVuexApiCall(service.handleUpdateUser, payload)
@@ -81,12 +87,16 @@ const handleOnSubmit = async (data:any) => {
   }
 }
 
-onMounted(async () => {
+const fetchDefaultValues = async () => {
+  if (isLoading.value) {
+    return
+  }
+
   isLoading.value = true
 
   const response = await handleVuexApiCall(service.handleShowUser, routeParams.id)
 
-  isLoading.value = false;
+  isLoading.value = false
 
   if (response.success) {
     defaultValue.value = response.data.result
@@ -95,6 +105,10 @@ onMounted(async () => {
     notyf.error(error)
     router.push({ name: 'users' })
   }
+}
+
+onMounted(async () => {
+  await fetchDefaultValues()
 })
 </script>
 
@@ -108,19 +122,16 @@ onMounted(async () => {
           You can see pages content samples from 
           files in /src/components/pages directory
         -->
-        <VBreadcrumb :items="breadcrumb" separator="arrow" with-icons />
+      <VBreadcrumb :items="breadcrumb" separator="arrow" with-icons />
 
-        <VProgress 
-          size="tiny" 
-          v-show="isLoading"
-        />
+      <VProgress size="tiny" v-show="isLoading" />
 
-        <UserFormLayout 
-          title="Update User"
-          @submit="handleOnSubmit" 
-          :loading="isLoading"
-          :default-value="defaultValue"
-        />
+      <UserFormLayout
+        title="Edit User"
+        @submit="handleOnSubmit"
+        :loading="isLoading"
+        :default-value="defaultValue"
+      />
     </div>
   </SidebarLayout>
 </template>

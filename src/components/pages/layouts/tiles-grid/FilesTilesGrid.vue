@@ -35,6 +35,7 @@ function formatDocuments(data: any) {
       size: data[i].size,
       extension: data[i].extension,
       match: data[i].match,
+      has_user_metadata: data[i].has_user_metadata,
     }
   }
 
@@ -167,6 +168,19 @@ watch(
           @click="onSelectedFile(item.id)"
           @contextmenu.prevent="setCurrentContextMenu(item.id)"
         >
+          <Tippy placement="left">
+            <div
+              class="status"
+              :class="{ 'has-user-metadata': !item.has_user_metadata }"
+            ></div>
+            <template #content>
+              <div class="v-popover-content is-text">
+                <div class="popover-head">
+                  <h4 class="dark-inverted">No Metadata</h4>
+                </div>
+              </div>
+            </template>
+          </Tippy>
           <div class="tile-grid-item" :class="{ 'is-active': isFileSelected(item.id) }">
             <div class="tile-grid-item-inner">
               <span
@@ -237,98 +251,117 @@ watch(
 }
 
 .tile-grid-v2 {
-  .tile-grid-item {
-    @include vuero-s-card;
-
-    border-radius: 14px;
-    padding: 16px;
-    cursor: pointer;
-
-    &.is-active {
-      border-color: var(--primary) !important;
-      box-shadow: var(--primary-box-shadow) !important;
-    }
-
-    .tile-grid-item-inner {
+  .columns {
+    .column {
       display: flex;
       align-items: center;
 
-      > img {
-        display: block;
-        width: 50px;
-        height: 50px;
-        min-width: 50px;
+      .status {
+        height: 8px;
+        width: 8px;
+        min-width: 8px;
+        margin: 0 16px 0 0;
+
+        &.has-user-metadata {
+          border-radius: var(--radius-rounded);
+          background: var(--warning);
+        }
       }
 
-      .meta {
-        margin-left: 10px;
-        line-height: 1.4;
+      .tile-grid-item {
+        @include vuero-s-card;
 
-        .filename {
-          word-break: break-all;
+        border-radius: 14px;
+        padding: 16px;
+        cursor: pointer;
+
+        &.is-active {
+          border-color: var(--primary) !important;
+          box-shadow: var(--primary-box-shadow) !important;
         }
 
-        span {
-          display: block;
-          font-family: var(--font);
+        .tile-grid-item-inner {
+          display: flex;
+          align-items: center;
 
-          &:first-child {
-            color: var(--dark-text);
-            font-family: var(--font-alt);
-            font-weight: 600;
-            font-size: 1rem;
+          > img {
+            display: block;
+            width: 50px;
+            height: 50px;
+            min-width: 50px;
           }
 
-          &:nth-child(2) {
-            display: flex;
-            align-items: center;
+          .meta {
+            margin-left: 10px;
+            line-height: 1.4;
+
+            .filename {
+              word-break: break-all;
+            }
 
             span {
-              display: inline-block;
-              color: var(--light-text);
-              font-size: 0.8rem;
-              font-weight: 400;
-            }
+              display: block;
+              font-family: var(--font);
 
-            .icon-separator {
-              position: relative;
-              font-size: 4px;
-              color: var(--light-text);
-              padding: 0 6px;
+              &:first-child {
+                color: var(--dark-text);
+                font-family: var(--font-alt);
+                font-weight: 600;
+                font-size: 1rem;
+              }
+
+              &:nth-child(2) {
+                display: flex;
+                align-items: center;
+
+                span {
+                  display: inline-block;
+                  color: var(--light-text);
+                  font-size: 0.8rem;
+                  font-weight: 400;
+                }
+
+                .icon-separator {
+                  position: relative;
+                  font-size: 4px;
+                  color: var(--light-text);
+                  padding: 0 6px;
+                }
+              }
             }
+          }
+
+          .dropdown {
+            margin-left: auto;
+          }
+
+          .fiv-viv {
+            min-width: 3rem;
           }
         }
-      }
 
-      .dropdown {
-        margin-left: auto;
-      }
+        .tile-grid-item-footer {
+          ul {
+            list-style: disc;
+            margin-left: 2rem;
 
-      .fiv-viv {
-        min-width: 3rem;
-      }
-    }
+            li {
+              &:not(:last-child) {
+                margin-bottom: 0.5rem;
+              }
 
-    .tile-grid-item-footer {
-      ul {
-        list-style: disc;
-        margin-left: 2rem;
+              .subject {
+                font-weight: 500;
+              }
 
-        li {
-          &:not(:last-child) {
-            margin-bottom: 0.5rem;
-          }
-
-          .subject {
-            font-weight: 500;
-          }
-
-          .description {
-            em {
-              font-weight: 500;
-              background: var(--yellow);
-              padding: 3px;
-              border-radius: var(--radius);
+              .description {
+                em {
+                  font-weight: 500;
+                  background: var(--yellow);
+                  padding: 3px;
+                  border-radius: var(--radius);
+                }
+              }
             }
           }
         }

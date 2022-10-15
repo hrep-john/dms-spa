@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import EventEnum from '/@src/enums/changelog/event'
 import { useI18n } from 'vue-i18n'
+import { humanize } from '/@src/utils/helper'
 
 const { t } = useI18n()
 
@@ -29,6 +30,12 @@ const getItemDescription = (item: { event: ''; filename: '' }) => {
     case EventEnum.Deleted:
       description = ` Deleted a file (${item.filename}).`
       break
+    case EventEnum.Downloaded:
+      description = ` Downloaded this file (${item.filename}).`
+      break
+    case EventEnum.Viewed:
+      description = ` Viewed this file (${item.filename}).`
+      break
   }
 
   return description
@@ -37,42 +44,53 @@ const getItemDescription = (item: { event: ''; filename: '' }) => {
 
 <template>
   <div class="timeline-wrapper">
-    <div class="timeline-header"></div>
     <div class="timeline-wrapper-inner">
       <div class="timeline-container">
         <!--Timeline item-->
-        <div v-for="(item, key) in items" :key="key" class="timeline-item" :class="{ 'no-stem': items.length === 1 }">
+        <div
+          v-for="(item, key) in items"
+          :key="key"
+          class="timeline-item"
+          :class="{ 'no-stem': items.length === 1 }"
+        >
           <div class="date">
             <span>{{ item.date }}</span>
           </div>
           <div class="dot is-primary"></div>
           <div class="content-wrap">
             <div class="content-box">
-              <div class="status"></div>
-              <VAvatar :picture="item.profile_picture_url" />
-
               <div class="box-text">
+                <div class="avatar-wrapper">
+                  <VAvatar :picture="item.profile_picture_url" />
+                </div>
                 <div class="meta-text">
-									<span>{{ item.time }}</span>
-									<span class="user-fullname">{{ item.full_name }}</span>
-                  <p class="mt-3 description">  
-										<label> {{ getItemDescription(item) }} </label>
-                    <ol class="ml-4 mt-2">
-											<li 
-												v-for="(list, listKey) in item.changes" 
-												:key="listKey"
-												class="mt-1"
-											>
-                        <VTag color="info" :label="list.field" curved /> 
-												<label class="is-lowercase mx-1">{{ t('label.from') }}</label>
-                        <span>{{list.old_value}}</span>
-												<label class="is-lowercase mx-1">{{ t('label.to') }}</label>
-                        <span>{{list.new_value}}</span>
-											</li>
-										</ol>
-                  </p>
+                  <span>{{ item.time }}</span>
+                  <span class="user-fullname">{{ item.full_name }}</span>
+                  <div class="description">
+                    <label> {{ getItemDescription(item) }} </label>
+                  </div>
                 </div>
               </div>
+
+              <table
+                v-if="item.changes.length > 0"
+                class="table is-striped is-fullwidth mt-2"
+              >
+                <thead>
+                  <tr>
+                    <th scope="col">Field</th>
+                    <th scope="col">Old Value</th>
+                    <th scope="col">New Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(list, listKey) in item.changes" :key="listKey">
+                    <td>{{ humanize(list.field) }}</td>
+                    <td>{{ list.old_value }}</td>
+                    <td>{{ list.new_value }}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -94,13 +112,14 @@ const getItemDescription = (item: { event: ''; filename: '' }) => {
 1. Timeline
 ========================================================================== */
 .timeline-wrapper {
-  max-width: 940px;
+  max-width: 100%;
   margin: 0 auto;
 
   .timeline-wrapper-inner {
-    padding-top: 30px;
-
     .timeline-container {
+      max-height: 50vh;
+      overflow-y: auto;
+
       .timeline-item {
         position: relative;
         display: flex;
@@ -199,7 +218,7 @@ const getItemDescription = (item: { event: ''; filename: '' }) => {
 
           .content-box {
             display: flex;
-            align-items: center;
+            flex-direction: column;
 
             .status {
               height: 8px;
@@ -213,12 +232,18 @@ const getItemDescription = (item: { event: ''; filename: '' }) => {
             .box-text {
               display: flex;
               align-items: center;
-              justify-content: space-between;
-              margin-left: 12px;
               flex-grow: 2;
 
               .meta-text {
                 line-height: 1.2;
+                width: 100%;
+                margin-left: 1rem;
+
+                .user-fullname {
+                  font-weight: bolder;
+                  color: var(--dark-text);
+                  margin-left: 0.5rem;
+                }
 
                 p.description {
                   color: var(--light-text-dark-10);
@@ -232,32 +257,11 @@ const getItemDescription = (item: { event: ''; filename: '' }) => {
                   a {
                     color: var(--primary);
                   }
-
-                  .tag {
-                    position: relative;
-                    top: -1px;
-                    font-weight: 500;
-                    line-height: 1.8;
-                    height: 1.8em;
-                    margin: 0 2px;
-                  }
-
-                  ol {
-                    li {
-                      word-break: break-all;
-                    }
-                  }
                 }
 
                 > span {
                   color: var(--light-text);
                   font-size: 0.9rem;
-                }
-
-                .user-fullname {
-                  font-weight: bolder;
-                  color: var(--dark-text);
-                  margin-left: 0.5rem;
                 }
               }
             }

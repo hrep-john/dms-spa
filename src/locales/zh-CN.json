@@ -1,37 +1,130 @@
 {
-  "select-language": "选择语言",
-  "auth": {
-    "title": "现在就加入我们",
-    "subtitle": "从创建你的账户开始",
+  "label": {
+    "back_to_login": "Back to login",
+    "barangay": "Barangay",
+    "birthday": "Birthday",
+    "city": "City",
+    "confirm": "Confirm",
+    "confirm_password": "Confirm Password",
+    "continue": "Continue",
+    "created_at": "Created At",
+    "created_by": "Created By",
+    "data_source": "Data Source",
+    "date_created": "Date Created",
+    "email": "Email",
+    "email_address": "Email Address",
+    "first_name": "First Name",
+    "from": "From",
+    "forgot_password": "Forgot Password",
+    "home_address": "Home Address",
+    "label": "Label",
+    "last_name": "Last Name",
+    "last_updated": "Last Updated",
+    "middle_name": "Middle Name",
+    "mobile_number": "Mobile Number",
+    "module": "Module",
+    "name": "Name",
+    "new_password": "New Password",
+    "tenant_name": "Tenant Name",
+    "password": "Password",
+    "record_info": "Record Info",
+    "region": "Region",
+    "reset_password": "Reset Password",
+    "recover_account": "Recover Account",
+    "role": "Role",
+    "roles": "Roles",
+    "show": "Show",
+    "to": "To",
+    "type": "Type",
+    "updated_at": "Updated At",
+    "updated_by": "Updated By",
+    "user_id": "User ID",
+    "user_name": "User Name",
+    "welcome_back": "Welcome Back",
+    "sex": "Sex"
+  },
+  "validation": {
+    "birthday": {
+      "max": "Birthday should not exceed today's date.",
+      "format": "Please select a valid date. "
+    },
+    "common": {
+      "input_field_minimum_length": "Field should contains at least 6 characters",
+      "input_field_maximum_length": "Field should not exceed 255 characters.",
+      "selected_value_invalid": "Selected value is not valid."
+    },
+    "confirm_password": {
+      "required": "Confirm password is required",
+      "required_confirm": "Please, confirm your password",
+      "match": "The password does not match"
+    },
+    "email_address": {
+      "required": "Email is required",
+      "required_password_reset_instruction": "Enter your email, it will be required to receive password reset instruction",
+      "valid_format": "Please, enter a valid email address"
+    },
+    "first_name": {
+      "required": "First Name is required"
+    },
     "label": {
-      "promotional": "接收促销优惠"
+      "required": "Label is required"
     },
-    "action": {
-      "login": "我已经有一个账户",
-      "signup": "注册"
+    "last_name": {
+      "required": "Last Name is required"
     },
-    "placeholder": {
-      "name": "姓名",
-      "email": "电子邮件地址",
-      "password": "密码",
-      "passwordCheck": "密码验证"
+    "name": {
+      "required": "Name is required"
     },
-    "errors": {
-      "name": {
-        "required": "您的姓名是必填的"
+    "mobile_number": {
+      "format": "The mobile number should follow this format: 09XXXXXXXXX."
+    },
+    "tenant": {
+      "required": "Tenant is required"
+    },
+    "password": {
+      "required": "Password is required",
+      "required_login": "Enter your password with at least 6 characters, it will be required to login",
+      "minimum": "The password should contains at least 6 characters"
+    },
+    "role": {
+      "required": "Role is required"
+    },
+    "sex": {
+      "in": "Valid sex values are `Male` and `Female`"
+    },
+    "udf": {
+      "module": {
+        "required": "UDF Module is required",
+        "in": "Valid UDF Module value is `Document`"
       },
-      "email": {
-        "required": "输入你的电子邮件，它将是登录的必要条件",
-        "format": "请输入一个有效的电子邮件"
+      "type": {
+        "required": "UDF Type is required",
+        "in": "Valid UDF Type values are `Text`, `Number`, `Dropdown`, and `Date`"
       },
-      "password": {
-        "required": "请输入你的密码，至少有8个字符，登录时必须输入",
-        "length": "密码应至少包含8个字符"
+      "show": {
+        "required": "Show is required"
       },
-      "passwordCheck": {
-        "required": "请确认您的密码",
-        "match": "该密码不匹配"
+      "source": {
+        "required": "UDF Data Source is required",
+        "in": "Valid UDF Source values are `User List`, and `Custom List`"
       }
+    },
+    "username": {
+      "minimum": "The user id should contains at least 6 characters",
+      "required": "User ID is required"
     }
+  },
+  "info": {
+    "email_procedure_guide": "Enter your email and click on the confirm button to reset your password. We'll send you an email detailing the steps to complete the procedure.",
+    "press_enter_key_to_add_an_item": "Press enter key to add an item",
+    "please_login_to_your_account": "Please log in to your account",
+    "reset_account_password": "Reset your account password",
+    "select_your_gender": "Select your gender",
+    "select_your_tenant": "Select your tenant",
+    "select_your_roles": "Select your roles",
+    "your_indentity_has_been_identified": "Your identity has been verified!"
+  },
+  "error": {
+    "session_expired": "Your session has expired"
   }
 }

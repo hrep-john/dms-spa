@@ -103,4 +103,35 @@
 
   // landing-yyy HSL (#191c2b) // hsl(230, 26%, 13%)
   @include colorHsl('landing-yyy', 230, 26%, 13%);
+
+  /* TENANT CUSTOMIZATION */
+
+  // main sidebar HSL (#a9abac) // hsl(200, 1.78%, 66.86%)
+  @include colorHsl('main-sidebar-font-color', 200, 1.78%, 66.86%);
+
+  // main sidebar HSL (#f9f9f9) // hsl(0, 0%, 97.65%)
+  @include colorHsl('main-sidebar-background-color', 0, 0%, 98%);
+
+  // background color HSL (#f0f0f0) // hsl(0, 0%, 94.12%)
+  @include colorHsl('background-color', 0, 0%, 94.12%);
+
+  // login-left-section-background-color HSL (#f5f6fa) // hsl(228, 33%, 97%)
+  @include colorHsl('login-left-section-background-color', 228, 33%, 97%);
+
+  // login-right-section-background-color HSL (#fff) // hsl(0, 0%, 100%)
+  @include colorHsl('login-right-section-background-color', 0, 0%, 100%);
+
+  // forgot-password-left-section-background-color HSL (#fff) // hsl(0, 0%, 100%)
+  @include colorHsl('forgot-password-left-section-background-color', 0, 0%, 100%);
+
+  // forgot-password-right-section-background-color HSL (#f5f6fa) // hsl(228, 33%, 97%)
+  @include colorHsl('forgot-password-right-section-background-color', 228, 33%, 97%);
+
+  // reset-password-left-section-background-color HSL (#fff) // hsl(0, 0%, 100%)
+  @include colorHsl('reset-password-left-section-background-color', 0, 0%, 100%);
+
+  // reset-password-right-section-background-color HSL (#f5f6fa) // hsl(228, 33%, 97%)
+  @include colorHsl('reset-password-right-section-background-color', 228, 33%, 97%);
+
+  /* END OF TENANT CUSTOMIZATION */
 }

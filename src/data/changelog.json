@@ -1,21 +1,53 @@
 {
-  "current_version": "1.0.0",
+  "current_version": "1.0.1",
   "versions": [
     {
+      "release_number": "1.0.1",
+      "date": "2022-10-19",
+      "features": [
+        {
+          "subject": "Document User Access",
+          "description": "Users can now assign all the allowed users to the document. Default assigned users are owner and tenant admin."
+        },
+        {
+          "subject": "Tenant Settings",
+          "description": "Users can now configure the app settings."
+        },
+        {
+          "subject": "Tenant UI Customization",
+          "description": "Users can now configure the app's user interface."
+        },
+        {
+          "subject": "Role Management",
+          "description": "Users can now manage the roles and attach permissions."
+        },
+        {
+          "subject": "Custom Report",
+          "description": "Users can now view, search, and print the report."
+        }
+      ],
+      "enhancements": [],
+      "bug_fixes": []
+    },
+    {
       "release_number": "1.0.0",
-      "date": "2022-07-18",
+      "date": "2022-08-01",
       "features": [
         {
           "subject": "Document Management",
-          "description": "Users can now view, add, edit, delete, and download a documents."
+          "description": "Users can now search, view, add, edit, delete, and download a documents."
         },
         {
           "subject": "User Management",
-          "description": "Admin users can now view, add, edit, and delete a user."
+          "description": "Admin users can now search, view, add, edit, and delete a user."
         },
         {
           "subject": "Forgot/Reset Password",
           "description": "Users may able to reset his/her password."
+        },
+        {
+          "subject": "User Defined Field (UDF) Management",
+          "description": "Admin users can now search, view, add, edit, and delete user defined field metadata."
         }
       ],
       "enhancements": [],

@@ -18,9 +18,8 @@ const viewWrapper = useViewWrapper()
 viewWrapper.setPageTitle('Settings')
 
 useHead({
-  title: `Settings - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `Settings | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
-
 </script>
 
 <template>
@@ -34,7 +33,7 @@ useHead({
           files in /src/components/pages directory
         -->
 
-        <SettingsProfile />
+      <SettingsProfile />
     </div>
   </SidebarLayout>
 </template>

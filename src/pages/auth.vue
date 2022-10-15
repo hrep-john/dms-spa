@@ -109,6 +109,11 @@
         width: 100%;
         margin: 0 auto;
       }
+
+      .light-image,
+      .dark-image {
+        width: 100%;
+      }
     }
   }
 

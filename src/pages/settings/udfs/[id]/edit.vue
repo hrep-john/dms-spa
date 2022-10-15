@@ -1,8 +1,10 @@
 <route lang="yaml">
 meta:
   rolesAllowed:
-    - superadmin
-    - admin
+    - Superadmin
+    - Admin
+  permissionsAllowed:
+    - 'Settings: Edit User Defined Field'
 </route>
 
 <script setup lang="ts">
@@ -29,10 +31,10 @@ import { handleVuexApiCall } from '/@src/utils/helper'
 const router = useRouter()
 const notyf = useNotyf()
 const viewWrapper = useViewWrapper()
-viewWrapper.setPageTitle('Update User Defined Field')
+viewWrapper.setPageTitle('Edit User Defined Field')
 
 useHead({
-  title: `Update User Defined Field - ${import.meta.env.VITE_PROJECT_NAME}`,
+  title: `Edit User Defined Field | ${import.meta.env.VITE_PROJECT_NAME}`,
 })
 
 const routeParams = router.currentRoute.value.params
@@ -52,7 +54,7 @@ const breadcrumb = [
     },
   },
   {
-    label: 'Update UDF',
+    label: 'Edit UDF',
   },
 ]
 
@@ -83,7 +85,11 @@ const formatAttributes = (attributes: object) => {
   return attributes
 }
 
-onMounted(async () => {
+const fetchDefaultValues = async () => {
+  if (isLoading.value) {
+    return
+  }
+
   isLoading.value = true
 
   const response = await handleVuexApiCall(service.handleShowUdf, routeParams.id)
@@ -97,6 +103,10 @@ onMounted(async () => {
     notyf.error(error)
     router.push({ name: 'settings-udfs' })
   }
+}
+
+onMounted(async () => {
+  await fetchDefaultValues()
 })
 </script>
 
@@ -115,7 +125,7 @@ onMounted(async () => {
       <VProgress size="tiny" v-show="isLoading" />
 
       <UdfFormLayout
-        title="Update UDF"
+        title="Edit UDF"
         @submit="handleOnSubmit"
         :loading="isLoading"
         :default-value="defaultValue"

@@ -23,9 +23,10 @@ export const useFilter = defineStore('filter', () => {
     let outerGroup = []
 
     Object.keys(sortedFilters).forEach((key) => {
-      let innerGroup = sortedFilters[key].map(
-        (filter) => `${filter.field} ${filter.operator} \'${filter.value}\'`
-      )
+      let innerGroup = sortedFilters[key].map((filter) => {
+        let operator = filter.operator === 'to' ? '' : ` ${filter.operator}`
+        return `${filter.field} ${operator} ${filter.value}`
+      })
       innerGroup = innerGroup.join(' OR ')
       outerGroup.push(`(${innerGroup})`)
     })
@@ -33,6 +34,10 @@ export const useFilter = defineStore('filter', () => {
     outerGroup = outerGroup.join(' AND ')
 
     return outerGroup
+  }
+
+  function getFilterDropdownData() {
+    return filterDropdownData.value
   }
 
   function setFilterItem(newData: any, index: Number) {
@@ -53,6 +58,10 @@ export const useFilter = defineStore('filter', () => {
     )
   }
 
+  function clearFilterDropdownData() {
+    filterDropdownData.value = []
+  }
+
   return {
     filterData,
     filterDropdownData,
@@ -62,6 +71,8 @@ export const useFilter = defineStore('filter', () => {
     removeFilterDropdownItem,
     sortedFilterDropdownData,
     getFormattedFilterDropdownData,
+    getFilterDropdownData,
+    clearFilterDropdownData,
   } as const
 })
 
