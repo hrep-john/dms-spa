@@ -1,10 +1,21 @@
 import { ref } from 'vue'
 import { acceptHMRUpdate, defineStore } from 'pinia'
+import { useStorage } from '@vueuse/core'
 
 export const useViewWrapper = defineStore('viewWrapper', () => {
   const isPushed = ref(false)
   const isPushedBlock = ref(false)
   const pageTitle = ref('Welcome')
+  const printoutTemplate = useStorage(
+    'printoutTemplate',
+    JSON.stringify({
+      headers: {
+        first_line: '',
+        second_line: '',
+        third_line: '',
+      },
+    })
+  )
 
   function setPushed(value: boolean) {
     isPushed.value = value
@@ -15,14 +26,23 @@ export const useViewWrapper = defineStore('viewWrapper', () => {
   function setPageTitle(value: string) {
     pageTitle.value = value
   }
+  function getPrintoutTemplate() {
+    return JSON.parse(printoutTemplate.value)
+  }
+  function setPrintoutTemplate(template: any) {
+    printoutTemplate.value = JSON.stringify(template)
+  }
 
   return {
     isPushed,
     isPushedBlock,
     pageTitle,
+    printoutTemplate,
     setPushed,
     setPushedBlock,
     setPageTitle,
+    getPrintoutTemplate,
+    setPrintoutTemplate,
   } as const
 })
 

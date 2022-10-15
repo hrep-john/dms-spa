@@ -70,7 +70,7 @@ watch(
 </script>
 
 <template>
-  <div class="control">
+  <div>
     <input
       type="text"
       class="input"
@@ -107,7 +107,7 @@ watch(
     >
       <template #default="{ inputValue, inputEvents }">
         <VField>
-          <VControl>
+          <VControl class="no-margin-right">
             <input class="input" :value="inputValue" v-on="inputEvents" />
           </VControl>
         </VField>
