@@ -238,6 +238,12 @@ onBeforeUnmount(() => {
     }
   }
 
+  table {
+    td {
+      color: #000 !important;
+    }
+  }
+
   .filters {
     margin-bottom: 1rem;
     display: flex;

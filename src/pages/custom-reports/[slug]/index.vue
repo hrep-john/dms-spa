@@ -304,7 +304,9 @@ const print = () => {
     filters: buildFilters(),
   })
 
-  window.open(`${routeParams.slug}/print`, '_blank')
+  const slug = currentRoute.value.params.slug
+
+  window.open(`${slug}/print`, '_blank')
 }
 
 const formatFilterItemLabel = (filterItem: any) => {
@@ -353,9 +355,9 @@ watch(
 )
 
 watch(
-  () => [currentRoutePath.value],
+  () => currentRoutePath.value,
   async (value) => {
-    if (value && typeof value === 'string') {
+    if (value && typeof value === 'string' && value.startsWith('/custom-reports/')) {
       clearRecords()
       filtermixins.clearFilterDropdownData()
       await fetchCustomReport()
@@ -369,7 +371,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <SidebarLayout default-sidebar="reports">
+  <SidebarLayout default-sidebar="reports" open-on-mounted>
     <!-- Content Wrapper -->
     <div class="page-content-inner">
       <!--

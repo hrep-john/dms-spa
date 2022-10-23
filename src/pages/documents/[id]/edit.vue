@@ -498,7 +498,7 @@ onMounted(async () => {
                     <div class="columns is-multiline">
                       <div class="column is-12" v-for="(udf, key) in udfs" :key="key">
                         <!-- TEXT FIELD -->
-                        <label>{{ udf.name }}</label>
+                        <p>{{ udf.name }}</p>
 
                         <textarea
                           type="textarea"
