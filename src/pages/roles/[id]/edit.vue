@@ -83,8 +83,17 @@ const handleOnSubmit = async (data: any) => {
     userSession.setPermissions(response.data.auth_user_permissions)
     router.push({ name: 'roles' })
   } else {
-    const error = response?.body?.message
-    notyf.error(error)
+    const errors = response?.body?.errors
+
+    if (errors === null) {
+      notyf.error(response?.body?.message)
+    } else {
+      for (let key of Object.keys(errors)) {
+        errors[key].forEach((error) => {
+          notyf.error(error)
+        })
+      }
+    }
   }
 }
 

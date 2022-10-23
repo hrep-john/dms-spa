@@ -37,7 +37,7 @@ viewWrapper.setPageTitle('Report Builder List')
 
 const service = reportBuilderService.actions
 
-const isLoading = ref(true)
+const isLoading = ref(false)
 const search = ref('')
 const datatable = ref({ data: [], meta: {} })
 const page = ref(1)
@@ -55,6 +55,10 @@ const columns = {
 } as const
 
 const paginate = async (page = 1) => {
+  if (isLoading.value) {
+    return
+  }
+
   isLoading.value = true
 
   const payload = {
@@ -142,10 +146,18 @@ const getSelectedRow = (id: any) => {
 }
 
 const handleOnDeletedRecord = async (close) => {
+  if (isLoading.value) {
+    return
+  }
+
+  isLoading.value = true
+
   const response = await handleVuexApiCall(
     service.handleDeleteReportBuilder,
     deleteConfirm.value.selected
   )
+
+  isLoading.value = false
 
   if (response.success) {
     notyf.success('Deleted successfully.')

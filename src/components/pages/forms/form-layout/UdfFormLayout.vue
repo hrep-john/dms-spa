@@ -273,7 +273,7 @@ watch(
 
           <div class="columns is-multiline">
             <!--Field-->
-            <div class="column is-6">
+            <div class="column is-12">
               <Field v-slot="{ field, errorMessage }" name="label">
                 <VField>
                   <label>{{ t('label.label') }}</label>
@@ -294,7 +294,7 @@ watch(
             </div>
 
             <!--Field-->
-            <div class="column is-6">
+            <div class="column is-12">
               <Field v-slot="{ field, errorMessage }" name="entitable_type">
                 <VField>
                   <label>{{ t('label.module') }}</label>
@@ -323,7 +323,7 @@ watch(
             </div> -->
 
             <!--Field-->
-            <div class="column is-6">
+            <div class="column is-12">
               <Field v-slot="{ field, errorMessage }" name="type">
                 <VField>
                   <label>{{ t('label.type') }}</label>
@@ -346,7 +346,7 @@ watch(
 
             <!--Field-->
             <div
-              class="column is-6"
+              class="column is-12"
               v-show="selectedUdfType == UdfEnum.Types.Dropdown.value"
             >
               <VField>

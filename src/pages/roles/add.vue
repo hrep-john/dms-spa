@@ -54,6 +54,12 @@ const breadcrumb = [
 ]
 
 const handleOnSubmit = async (data: any) => {
+  if (isLoading.value) {
+    return
+  }
+
+  isLoading.value = true
+
   const response = await handleVuexApiCall(service.handleStoreRole, data)
 
   isLoading.value = false
@@ -64,10 +70,14 @@ const handleOnSubmit = async (data: any) => {
   } else {
     const errors = response?.body?.errors
 
-    for (let key of Object.keys(errors)) {
-      errors[key].forEach((error) => {
-        notyf.error(error)
-      })
+    if (errors === null) {
+      notyf.error(response?.body?.message)
+    } else {
+      for (let key of Object.keys(errors)) {
+        errors[key].forEach((error) => {
+          notyf.error(error)
+        })
+      }
     }
   }
 }

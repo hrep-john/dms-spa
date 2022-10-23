@@ -37,10 +37,6 @@ useHead({
 const routeParams = router.currentRoute.value.params
 const service = tenantService.actions
 const isLoading = ref(false)
-const errors = ref({
-  data: [],
-  show: false,
-})
 
 const breadcrumb = [
   {
@@ -57,38 +53,37 @@ const breadcrumb = [
 
 const defaultValue = ref()
 
-const formatErrors = (errors: any) => {
-  const errorLists = []
-
-  for (let item in errors) {
-    for (let i = 0; i < errors[item].length; i++) {
-      errorLists.push(errors[item][i])
-    }
+const handleOnSubmit = async (data: any) => {
+  if (isLoading.value) {
+    return
   }
 
-  return errorLists
-}
-
-const handleOnSubmit = async (data: any) => {
-  errors.value.data = []
   isLoading.value = true
 
   const payload = data
   payload.tenant_id = routeParams.id
+  payload.id = routeParams.id
 
-  service
-    .handleUpdateTenant(payload, routeParams.id)
-    .then((response) => {
-      isLoading.value = false
-      notyf.success(response)
-      router.push({ name: 'tenants' })
-    })
-    .catch((error) => {
-      notyf.error(error.response.data.message)
-      errors.value.show = true
-      errors.value.data = formatErrors(error.response.data.errors)
-      isLoading.value = false
-    })
+  const response = await handleVuexApiCall(service.handleUpdateTenant, payload)
+
+  isLoading.value = false
+
+  if (response.success) {
+    notyf.success(response.data)
+    router.push({ name: 'tenants' })
+  } else {
+    const errors = response?.body?.errors
+
+    if (errors === null) {
+      notyf.error(response?.body?.message)
+    } else {
+      for (let key of Object.keys(errors)) {
+        errors[key].forEach((error) => {
+          notyf.error(error)
+        })
+      }
+    }
+  }
 }
 
 const fetchDefaultValues = async () => {

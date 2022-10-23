@@ -137,7 +137,7 @@ const truncateText = (text: string, extension: string) => {
       <div class="column is-6">
         <div class="dashboard-card has-margin-bottom">
           <div class="card-head">
-            <h3 class="dark-inverted">Recently Assigned To You</h3>
+            <h3 class="dark-inverted">Recently Shared To You</h3>
             <RouterLink
               v-if="assignedDocuments.length > 0"
               class="action-link"

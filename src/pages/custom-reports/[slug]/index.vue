@@ -44,7 +44,7 @@ viewWrapper.setPageTitle('')
 const service = customReportService.actions
 const udfService = udfServices.actions
 
-const isLoading = ref(true)
+const isLoading = ref(false)
 const search = ref('')
 const datatable = ref({ data: [], meta: {} })
 const page = ref(1)
@@ -59,8 +59,11 @@ const references = ref({
 })
 
 const fetchCustomReport = async (page = 1) => {
+  if (isLoading.value) {
+    return
+  }
+
   isLoading.value = true
-  console.log('currentRoute.value.params.slug', currentRoute.value.params.slug)
 
   const payload = {
     page: page,
@@ -70,6 +73,8 @@ const fetchCustomReport = async (page = 1) => {
   }
 
   const response = await handleVuexApiCall(service.handleShowCustomReport, payload)
+
+  isLoading.value = false
 
   if (response.success) {
     const formatted = formatData(response.data.results.data)
@@ -88,8 +93,6 @@ const fetchCustomReport = async (page = 1) => {
     const error = response?.body?.message
     notyf.error(error)
   }
-
-  isLoading.value = false
 }
 
 const initializeFilters = (filters: any) => {

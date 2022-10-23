@@ -3,11 +3,29 @@ import { useWindowScroll } from '@vueuse/core'
 import { computed, ref, onMounted, watch } from 'vue'
 import { useNotyf } from '/@src/composable/useNotyf'
 
+import { Field, useForm } from 'vee-validate'
+import { useI18n } from 'vue-i18n'
+import * as yup from 'yup'
+
+const { t } = useI18n()
+
+// Define a validation schema
+let objectSchema = {
+  domain: yup
+    .string()
+    .required(t('validation.domain.required'))
+    .min(6, t('validation.common.input_field_minimum_length'))
+    .max(255, t('validation.common.input_field_maximum_length')),
+  name: yup
+    .string()
+    .required(t('validation.name.required'))
+    .min(6, t('validation.common.input_field_minimum_length'))
+    .max(255, t('validation.common.input_field_maximum_length')),
+}
+
+const schema = yup.object(objectSchema)
+
 const props = defineProps({
-  errors: {
-    type: Array,
-    default: {},
-  },
   loading: {
     type: Boolean,
     default: false,
@@ -40,14 +58,14 @@ const isStuck = computed(() => {
   return y.value > 30
 })
 
-const submit = () => {
-  const data = {
-    domain: details.value.domain,
-    name: details.value.name,
-  }
+const { handleSubmit } = useForm({
+  validationSchema: schema,
+  initialValues: details,
+})
 
-  emit('submit', data)
-}
+const onSubmit = handleSubmit(async (values) => {
+  emit('submit', values)
+})
 
 const handleDefaultValue = () => {
   const defaultValue = props.defaultValue
@@ -73,15 +91,6 @@ watch(
 
 <template>
   <form class="form-layout" @submit.prevent>
-    <VMessage
-      color="danger"
-      v-for="(error, key) in props.errors.data"
-      :key="key"
-      v-show="props.errors.show"
-    >
-      {{ error }}
-    </VMessage>
-
     <div class="form-outer">
       <div :class="[isStuck && 'is-stuck']" class="form-header stuck-header">
         <div class="form-header-inner">
@@ -98,7 +107,7 @@ watch(
               >
                 Cancel
               </VButton>
-              <VButton color="primary" raised @click="submit"> Submit </VButton>
+              <VButton color="primary" raised @click="onSubmit"> Submit </VButton>
             </div>
           </div>
         </div>
@@ -174,35 +183,45 @@ watch(
           </div>
 
           <div class="columns is-multiline">
+            <!--Field-->
             <div class="column is-6">
-              <VField>
-                <label>Tenant Domain *</label>
-                <VControl>
-                  <input
-                    v-model="details.domain"
-                    type="text"
-                    class="input"
-                    placeholder=""
-                    autocomplete="domain"
-                    :disabled="isLoading"
-                  />
-                </VControl>
-              </VField>
+              <Field v-slot="{ field, errorMessage }" name="domain">
+                <VField>
+                  <label>{{ t('label.domain') }}</label>
+                  <VControl icon="feather:globe" :has-error="Boolean(errorMessage)">
+                    <input
+                      v-bind="field"
+                      class="input"
+                      type="text"
+                      :disabled="isLoading"
+                      autocomplete="domain"
+                    />
+                    <p v-if="errorMessage" class="help is-danger">
+                      {{ errorMessage }}
+                    </p>
+                  </VControl>
+                </VField>
+              </Field>
             </div>
+            <!--Field-->
             <div class="column is-6">
-              <VField>
-                <label>Tenant Name *</label>
-                <VControl>
-                  <input
-                    v-model="details.name"
-                    type="text"
-                    class="input"
-                    placeholder=""
-                    autocomplete="name"
-                    :disabled="isLoading"
-                  />
-                </VControl>
-              </VField>
+              <Field v-slot="{ field, errorMessage }" name="name">
+                <VField>
+                  <label>{{ t('label.name') }}</label>
+                  <VControl icon="feather:type" :has-error="Boolean(errorMessage)">
+                    <input
+                      v-bind="field"
+                      class="input"
+                      type="text"
+                      :disabled="isLoading"
+                      autocomplete="name"
+                    />
+                    <p v-if="errorMessage" class="help is-danger">
+                      {{ errorMessage }}
+                    </p>
+                  </VControl>
+                </VField>
+              </Field>
             </div>
           </div>
         </div>

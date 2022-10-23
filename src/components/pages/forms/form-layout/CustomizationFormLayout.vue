@@ -52,6 +52,8 @@ const onAddFile = async (data: any) => {
     payload
   )
 
+  isLoading.value = false
+
   if (response.success) {
     const url = response.data.url
     const index = getConfigItemIndex(selectedFileUpload.value)
@@ -61,8 +63,6 @@ const onAddFile = async (data: any) => {
     const error = response?.body?.message
     notyf.error(error)
   }
-
-  isLoading.value = false
 }
 
 const onRemoveFile = (data: any) => {
