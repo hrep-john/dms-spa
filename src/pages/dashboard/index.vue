@@ -43,14 +43,14 @@ const getDashboard = async () => {
 
   const response = await handleVuexApiCall(service.handleGetDashboard, payload)
 
+  isLoading.value = false
+
   if (response.success) {
     dashboard.value = response.data
   } else {
     const error = response?.body?.message
     notyf.error(error)
   }
-
-  isLoading.value = false
 }
 
 onMounted(async () => {

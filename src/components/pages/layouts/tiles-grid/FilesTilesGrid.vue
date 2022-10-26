@@ -168,7 +168,7 @@ watch(
           @click="onSelectedFile(item.id)"
           @contextmenu.prevent="setCurrentContextMenu(item.id)"
         >
-          <Tippy placement="left">
+          <Tippy placement="left" v-if="props.udfs.length > 0">
             <div
               class="status"
               :class="{ 'has-user-metadata': !item.has_user_metadata }"
@@ -260,7 +260,7 @@ watch(
         height: 8px;
         width: 8px;
         min-width: 8px;
-        margin: 0 16px 0 0;
+        margin: 0 8px 0 0;
 
         &.has-user-metadata {
           border-radius: var(--radius-rounded);

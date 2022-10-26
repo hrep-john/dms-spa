@@ -40,7 +40,7 @@ viewWrapper.setPageTitle('Role List')
 
 const service = roleService.actions
 
-const isLoading = ref(true)
+const isLoading = ref(false)
 const search = ref('')
 const datatable = ref({ data: [], meta: {} })
 const page = ref(1)
@@ -58,6 +58,10 @@ const columns = {
 } as const
 
 const paginate = async (page = 1) => {
+  if (isLoading.value) {
+    return
+  }
+
   isLoading.value = true
 
   const payload = {
@@ -68,6 +72,8 @@ const paginate = async (page = 1) => {
 
   const response = await handleVuexApiCall(service.handleGetRoles, payload)
 
+  isLoading.value = false
+
   if (response.success) {
     const formatted = formatData(response.data.results.data)
     datatable.value.data = datatable.value.data.concat(formatted)
@@ -76,8 +82,6 @@ const paginate = async (page = 1) => {
     const error = response?.body?.message
     notyf.error(error)
   }
-
-  isLoading.value = false
 }
 
 const buildFilters = () => {
@@ -145,10 +149,18 @@ const getSelectedRow = (id: any) => {
 }
 
 const handleOnDeletedRecord = async (close) => {
+  if (isLoading.value) {
+    return
+  }
+
+  isLoading.value = true
+
   const response = await handleVuexApiCall(
     service.handleDeleteRole,
     deleteConfirm.value.selected
   )
+
+  isLoading.value = false
 
   if (response.success) {
     notyf.success('Deleted successfully.')

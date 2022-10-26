@@ -23,6 +23,7 @@ import { ref } from 'vue'
 import { useNotyf } from '/@src/composable/useNotyf'
 import tenantService from '/@src/stores/tenants'
 import { useRouter } from 'vue-router'
+import { handleVuexApiCall } from '/@src/utils/helper'
 
 const router = useRouter()
 const notyf = useNotyf()
@@ -35,10 +36,6 @@ useHead({
 
 const service = tenantService.actions
 const isLoading = ref(false)
-const errors = ref({
-  data: [],
-  show: false,
-})
 
 const breadcrumb = [
   {
@@ -53,52 +50,33 @@ const breadcrumb = [
   },
 ]
 
-const formatErrors = (errors: any) => {
-  const errorLists = []
-
-  for (let item in errors) {
-    for (let i = 0; i < errors[item].length; i++) {
-      errorLists.push(errors[item][i])
-    }
-  }
-
-  return errorLists
-}
-
-const validateData = (data: any) => {
-  let errors = []
-
-  if (data.password !== data.confirm_password) {
-    errors.push('The password confirmation does not match.')
-  }
-
-  return errors
-}
-
 const handleOnSubmit = async (data: any) => {
-  errors.value.data = []
+  if (isLoading.value) {
+    return
+  }
+
   isLoading.value = true
 
-  errors.value.data = [...validateData(data)]
+  const response = await handleVuexApiCall(service.handleStoreTenant, data)
 
-  if (errors.value.data.length !== 0) {
-    errors.value.show = true
-    return false
+  isLoading.value = false
+
+  if (response.success) {
+    notyf.success(response.data)
+    router.push({ name: 'tenants' })
+  } else {
+    const errors = response?.body?.errors
+
+    if (errors === null) {
+      notyf.error(response?.body?.message)
+    } else {
+      for (let key of Object.keys(errors)) {
+        errors[key].forEach((error) => {
+          notyf.error(error)
+        })
+      }
+    }
   }
-
-  service
-    .handleStoreTenant(data)
-    .then((response) => {
-      isLoading.value = false
-      notyf.success(response)
-      router.push({ name: 'tenants' })
-    })
-    .catch((error) => {
-      notyf.error(error.response.data.message)
-      errors.value.show = true
-      errors.value.data = formatErrors(error.response.data.errors)
-      isLoading.value = false
-    })
 }
 </script>
 
@@ -118,7 +96,6 @@ const handleOnSubmit = async (data: any) => {
 
       <TenantFormLayout
         @submit="handleOnSubmit"
-        :errors="errors"
         :loading="isLoading"
         :is-new="true"
         title="Add Tenant"

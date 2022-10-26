@@ -4,4 +4,6 @@
       <component :is="Component" />
     </Transition>
   </RouterView>
+
+  <VReloadPrompt app-name="Document Management System" />
 </template>

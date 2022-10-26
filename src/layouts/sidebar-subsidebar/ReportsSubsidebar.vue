@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useUserSession } from '/@src/stores/userSession'
 import { groupBy } from '/@src/utils/helper'
+import { useViewWrapper } from '/@src/stores/viewWrapper'
 
+const viewWrapper = useViewWrapper()
 const userSession = useUserSession()
 const openSubsidebarLinks = ref('')
 const emit = defineEmits(['close'])
@@ -14,6 +16,10 @@ const props = defineProps({
   },
 })
 
+onMounted(() => {
+  openSubsidebarLinks.value = viewWrapper.getSubsidebarDropdown()
+})
+
 const isSuperadmin = computed(() => {
   const roles = userSession.roles ? JSON.parse(userSession.roles) : []
 
@@ -23,6 +29,15 @@ const isSuperadmin = computed(() => {
 const customReports = computed(() => {
   return groupBy(props.customReports || [], 'module')
 })
+
+watch(
+  () => openSubsidebarLinks.value,
+  (value) => {
+    if (value) {
+      viewWrapper.setSubsidebarDropdown(value)
+    }
+  }
+)
 </script>
 
 <template>

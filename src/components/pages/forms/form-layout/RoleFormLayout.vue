@@ -99,7 +99,11 @@ const fetchPermissions = async () => {
     return
   }
 
+  isLoading.value = true
+
   const response = await handleVuexApiCall(service.handleFetchPermissionList, null)
+
+  isLoading.value = false
 
   if (response.success) {
     references.value.permissions = response.data.results
@@ -107,8 +111,6 @@ const fetchPermissions = async () => {
     const error = response?.body?.message
     notyf.error(error)
   }
-
-  isLoading.value = false
 }
 
 const onSelectAllPermissions = (module: string) => {

@@ -12,6 +12,7 @@
     "created_by": "Created By",
     "data_source": "Data Source",
     "date_created": "Date Created",
+    "domain": "Domain",
     "email": "Email",
     "email_address": "Email Address",
     "filters": "Filters",
@@ -62,6 +63,9 @@
       "required": "Confirm password is required",
       "required_confirm": "Please, confirm your password",
       "match": "The password does not match"
+    },
+    "domain": {
+      "required": "Domain is required"
     },
     "email_address": {
       "required": "Email is required",

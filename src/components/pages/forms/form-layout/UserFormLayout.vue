@@ -163,7 +163,11 @@ const fetchRoles = async () => {
     ],
   }
 
+  isLoading.value = true
+
   const response = await handleVuexApiCall(service.handleFetchRoleList, payload)
+
+  isLoading.value = false
 
   if (response.success) {
     references.value.roles = response.data.results.map((item) => item.name)
@@ -171,8 +175,6 @@ const fetchRoles = async () => {
     const error = response?.body?.message
     notyf.error(error)
   }
-
-  isLoading.value = false
 }
 
 const mappings = (data: any) => {

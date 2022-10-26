@@ -34,7 +34,10 @@ const actions = {
     return response.data
   },
 
-  async handleUpdateTenant(payload: any, id: any) {
+  async handleUpdateTenant(payload: any) {
+    const id = payload.id
+    delete payload.id
+
     const headers = {
       'Content-Type': 'application/json',
       Accept: 'application/json',
