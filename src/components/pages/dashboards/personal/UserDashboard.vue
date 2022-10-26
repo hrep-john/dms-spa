@@ -97,7 +97,7 @@ const truncateText = (text: string, extension: string) => {
       </div>
 
       <div class="column is-6">
-        <div class="dashboard-card has-margin-bottom">
+        <div class="dashboard-card">
           <div class="card-head">
             <h3 class="dark-inverted">Recently Modified</h3>
             <RouterLink
@@ -135,7 +135,7 @@ const truncateText = (text: string, extension: string) => {
       </div>
 
       <div class="column is-6">
-        <div class="dashboard-card has-margin-bottom">
+        <div class="dashboard-card">
           <div class="card-head">
             <h3 class="dark-inverted">Recently Shared To You</h3>
             <RouterLink
@@ -345,6 +345,7 @@ const truncateText = (text: string, extension: string) => {
 
       .user-action {
         padding-bottom: 30px;
+        margin: auto;
       }
 
       .cta {

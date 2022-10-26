@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTenantSettings } from '/@src/stores/tenantSettings'
 
 const props = defineProps<{
   light?: boolean
+  width?: number
+  height?: number
 }>()
+
+const height = ref('38px')
+const width = ref('38px')
 
 const router = useRouter()
 const isLoading = ref(false)
@@ -26,10 +31,15 @@ router.afterEach(() => {
     isLoading.value = false
   }, 200)
 })
+
+onMounted(() => {
+  width.value = '38px'
+  height.value = '38px'
+})
 </script>
 
 <template>
-  <img :src="tenantLogo" alt="" />
+  <img :src="tenantLogo" alt="logo" />
 </template>
 
 <style lang="scss" scoped>

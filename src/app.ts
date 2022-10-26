@@ -9,6 +9,7 @@ import './styles'
 
 import { initDarkmode } from '/@src/stores/darkmode'
 import { createApi } from '/@src/composable/useApi'
+import { registerSW } from 'virtual:pwa-register'
 
 export type VueroAppContext = Awaited<ReturnType<typeof createApp>>
 
@@ -16,6 +17,8 @@ import { registerGlobalComponents, registerRouterNavigationGuards } from './app-
 
 import SimpleTypeahead from 'vue3-simple-typeahead'
 import 'vue3-simple-typeahead/dist/vue3-simple-typeahead.css'
+
+registerSW({ immediate: true })
 
 export async function createApp() {
   const head = createHead()

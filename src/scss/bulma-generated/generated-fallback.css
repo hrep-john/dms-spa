@@ -6086,6 +6086,11 @@ body.opened {
   color: rgb(65, 185, 131);
 }
 
+.filepond--wrapper .filepond--list .filepond--item .filepond--file-info,
+.filepond--wrapper .filepond--list .filepond--item .filepond--file-status {
+  color: rgb(255, 255, 255);
+}
+
 .is-dark .filepond-uploader:hover .lnil,
 .is-dark .filepond-profile-wrap:hover .lnil,
 .is-dark .filepond-square-wrap:hover .lnil {
@@ -6152,7 +6157,15 @@ body.opened {
   background: rgb(230, 41, 100);
 }
 
+.multiselect .multiselect-dropdown {
+  background: rgb(255, 255, 255);
+}
+
 .multiselect .multiselect-input {
+  background: rgb(255, 255, 255);
+}
+
+.multiselect .multiselect-search {
   background: rgb(255, 255, 255);
 }
 

@@ -515,11 +515,6 @@ onBeforeUnmount(() => {
       <div class="tile-grid-toolbar">
         <div class="left">
           <VControl icon="feather:search">
-            <!-- <input
-              v-model="search"
-              class="input custom-text-filter"
-              placeholder="Search..."
-            /> -->
             <vue3-simple-typeahead
               id="typeahead_id"
               class="autocomplete"
@@ -541,15 +536,13 @@ onBeforeUnmount(() => {
             </vue3-simple-typeahead>
           </VControl>
 
-          <Tippy placement="top">
-            <VIconBox
-              class="radius-25 mr-1"
-              color="primary-grey"
-              bordered
-              @click="clearSearchValue()"
-            >
-              <i class="fas fa-times"></i>
-            </VIconBox>
+          <Tippy placement="top" class="mr-1">
+            <VButton color="primary-grey" @click="clearSearchValue()" raised fullwidth>
+              <span class="icon">
+                <i aria-hidden="true" class="fas fa-times"></i>
+              </span>
+              <span>Clear</span>
+            </VButton>
             <template #content>
               <div class="v-popover-content is-text">
                 <div class="popover-head">
@@ -559,37 +552,43 @@ onBeforeUnmount(() => {
             </template>
           </Tippy>
 
-          <Tippy placement="top">
-            <VIconBox
-              class="radius-25 mr-1"
+          <Tippy placement="top" class="mr-1">
+            <VButton
               color="primary-grey"
-              bordered
               @click="onSearchEventHandler()"
+              raised
+              fullwidth
             >
-              <i class="fas fa-search"></i>
-            </VIconBox>
+              <span class="icon">
+                <i aria-hidden="true" class="fas fa-search"></i>
+              </span>
+              <span>Search</span>
+            </VButton>
             <template #content>
               <div class="v-popover-content is-text">
                 <div class="popover-head">
-                  <h4 class="dark-inverted">Search</h4>
+                  <h4 class="dark-inverted">Search a Document</h4>
                 </div>
               </div>
             </template>
           </Tippy>
 
-          <Tippy placement="top" v-if="doesUserCan('Document: Delete')">
-            <VIconBox
-              class="radius-25 mr-1"
-              color="primary-grey"
-              bordered
-              @click="showDeleteConfirmation"
-            >
-              <i class="fas fa-trash"></i>
-            </VIconBox>
+          <Tippy
+            placement="top"
+            @click="showDeleteConfirmation"
+            class="mr-1"
+            v-if="doesUserCan('Document: Delete')"
+          >
+            <VButton color="primary-grey" raised fullwidth>
+              <span class="icon">
+                <i aria-hidden="true" class="fas fa-trash"></i>
+              </span>
+              <span>Delete</span>
+            </VButton>
             <template #content>
               <div class="v-popover-content is-text">
                 <div class="popover-head">
-                  <h4 class="dark-inverted">Delete Document</h4>
+                  <h4 class="dark-inverted">Delete Documents</h4>
                 </div>
               </div>
             </template>
@@ -779,5 +778,44 @@ onBeforeUnmount(() => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
+}
+
+@media only screen and (max-width: 767px) {
+  .tile-grid-toolbar {
+    flex-direction: column;
+
+    .left {
+      width: 100%;
+      flex-direction: column;
+
+      span {
+        margin-right: 0px !important;
+      }
+
+      .v-button,
+      .simple-typeahead {
+        width: 100%;
+        margin-bottom: 12px;
+      }
+
+      .filter-dropdown {
+        width: 100%;
+        margin-right: 0px !important;
+      }
+    }
+
+    .buttons {
+      width: 100%;
+      margin-bottom: 1rem;
+
+      a {
+        width: 100%;
+
+        button.button {
+          width: 100%;
+        }
+      }
+    }
+  }
 }
 </style>

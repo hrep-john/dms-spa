@@ -4,7 +4,7 @@ meta:
     - Superadmin
     - Admin
   permissionsAllowed:
-    - 'Role: Edit User'
+    - 'Role: Edit Role'
 </route>
 
 <script setup lang="ts">
