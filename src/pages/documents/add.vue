@@ -34,17 +34,16 @@ import vueFilePond from 'vue-filepond'
 import 'filepond/dist/filepond.min.css'
 // Import FilePond plugins
 // Please note that you need to install these plugins separately
-// `npm i filepond-plugin-image-preview filepond-plugin-image-exif-orientation filepond-plugin-file-validate-type --save`
 import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation'
 import FilePondPluginImagePreview from 'filepond-plugin-image-preview'
 import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size'
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css'
 // temporary disable the file type validation, allow all file types
-// import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type'
+import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type'
 
 const FilePond = vueFilePond(
   FilePondPluginFileValidateSize,
-  // FilePondPluginFileValidateType,
+  FilePondPluginFileValidateType,
   FilePondPluginImageExifOrientation,
   FilePondPluginImagePreview
 )
@@ -125,6 +124,7 @@ const handleOnProcessDocument = (error: any, file: any) => {
         name="document"
         ref="pond"
         label-idle="Drop files here..."
+        accepted-file-types="image/*, application/*, audio/*, text/*, video/*, font/*"
         v-bind:allow-multiple="true"
         maxFileSize="30MB"
         :server="uploadApiEndpoint"

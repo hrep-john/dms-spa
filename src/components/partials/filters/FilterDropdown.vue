@@ -125,9 +125,12 @@ onMounted(() => {})
 <template>
   <VDropdown class="filter-dropdown" :class="{ 'is-right': props.right }" ref="dropdown">
     <template #button="{ toggle }">
-      <VIconBox class="radius-25 mr-1" color="light" bordered @click="toggle">
-        <i class="fas fa-filter"></i>
-      </VIconBox>
+      <VButton color="primary-grey" @click="toggle" raised bordered fullwidth>
+        <span class="icon">
+          <i aria-hidden="true" class="fas fa-filter"></i>
+        </span>
+        <span>Filter</span>
+      </VButton>
     </template>
 
     <template #content="{ close }">

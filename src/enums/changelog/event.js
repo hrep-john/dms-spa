@@ -4,4 +4,5 @@ export default {
   Deleted: 'deleted',
   Downloaded: 'downloaded',
   Viewed: 'viewed',
+  Uploaded: 'uploaded',
 }

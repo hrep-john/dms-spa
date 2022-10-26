@@ -51,6 +51,12 @@ const breadcrumb = [
 ]
 
 const handleOnSubmit = async (data: any) => {
+  if (isLoading.value) {
+    return
+  }
+
+  isLoading.value = true
+
   const response = await handleVuexApiCall(service.handleStoreReportBuilder, data)
 
   isLoading.value = false

@@ -37,7 +37,7 @@ viewWrapper.setPageTitle('Tenant List')
 
 const service = tenantService.actions
 
-const isLoading = ref(true)
+const isLoading = ref(false)
 const search = ref('')
 const datatable = ref({ data: [], meta: {} })
 const page = ref(1)
@@ -55,6 +55,10 @@ const columns = {
 } as const
 
 const paginate = async (page = 1) => {
+  if (isLoading.value) {
+    return
+  }
+
   isLoading.value = true
 
   const payload = {
@@ -154,10 +158,18 @@ const getSelectedRow = (id: any) => {
 }
 
 const handleOnDeletedRecord = async (close: Function) => {
+  if (isLoading.value) {
+    return
+  }
+
+  isLoading.value = true
+
   const response = await handleVuexApiCall(
     service.handleDeleteTenant,
     deleteConfirm.value.selected
   )
+
+  isLoading.value = false
 
   if (response.success) {
     notyf.success('Deleted successfully.')
@@ -216,8 +228,8 @@ watch(
       </div>
 
       <FlexListV1
-        :with-edit="doesUserCan('Tenant: Edit Tenant')"
-        :with-delete="doesUserCan('Tenant: Delete Tenant')"
+        :with-edit="true"
+        :with-delete="true"
         :is-loading="isLoading"
         :datatable="datatable"
         :columns="columns"

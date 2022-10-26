@@ -6,6 +6,7 @@ export const useViewWrapper = defineStore('viewWrapper', () => {
   const isPushed = ref(false)
   const isPushedBlock = ref(false)
   const pageTitle = ref('Welcome')
+  const subsidebarDropdown = ref('')
   const printoutTemplate = useStorage(
     'printoutTemplate',
     JSON.stringify({
@@ -32,6 +33,12 @@ export const useViewWrapper = defineStore('viewWrapper', () => {
   function setPrintoutTemplate(template: any) {
     printoutTemplate.value = JSON.stringify(template)
   }
+  function setSubsidebarDropdown(value: string) {
+    subsidebarDropdown.value = value
+  }
+  function getSubsidebarDropdown() {
+    return subsidebarDropdown.value
+  }
 
   return {
     isPushed,
@@ -43,6 +50,8 @@ export const useViewWrapper = defineStore('viewWrapper', () => {
     setPageTitle,
     getPrintoutTemplate,
     setPrintoutTemplate,
+    getSubsidebarDropdown,
+    setSubsidebarDropdown,
   } as const
 })
 

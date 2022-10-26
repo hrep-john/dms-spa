@@ -92,8 +92,8 @@ watch(
         </RouterLink>
 
         <div class="brand-end">
-          <!-- <NotificationsMobileDropdown />
-          <UserProfileDropdown /> -->
+          <!-- <NotificationsMobileDropdown /> -->
+          <UserProfileDropdown right />
         </div>
       </template>
     </MobileNavbar>
@@ -126,7 +126,7 @@ watch(
             </template>
           </Tippy>
         </li>
-        <li>
+        <li v-if="doesUserCan('Document: View List')">
           <Tippy placement="right">
             <RouterLink :to="{ name: 'documents' }">
               <i
@@ -170,16 +170,42 @@ watch(
             </template>
           </Tippy>
         </li>
+        <li v-if="doesUserCan('Role: View List')">
+          <Tippy placement="right">
+            <RouterLink :to="{ name: 'roles' }">
+              <i
+                aria-hidden="true"
+                class="fas fa-user-cog iconify sidebar-svg"
+                @click="activeMobileSubsidebar = 'roles'"
+              ></i>
+            </RouterLink>
+            <template #content>
+              <div class="v-popover-content is-text">
+                <div class="popover-head">
+                  <h4 class="dark-inverted">Roles</h4>
+                </div>
+                <div class="popover-body">
+                  <p>Manage Roles.</p>
+                </div>
+              </div>
+            </template>
+          </Tippy>
+        </li>
         <li>
           <Tippy placement="right">
             <a
-              aria-label="Manage Reports"
               :class="[activeMobileSubsidebar === 'reports' && 'is-active']"
+              data-content="Reports"
+              aria-label="Reports"
               tabindex="0"
-              @keydown.space.prevent="activeMobileSubsidebar = 'reports'"
-              @click="activeMobileSubsidebar = 'reports'"
+              @keydown.space.prevent="switchSidebar('reports')"
+              @click="switchSidebar('reports')"
             >
-              <i aria-hidden="true" class="iconify" data-icon="feather:file-text"></i>
+              <i
+                aria-hidden="true"
+                class="iconify sidebar-svg"
+                data-icon="feather:file-text"
+              ></i>
             </a>
             <template #content>
               <div class="v-popover-content is-text">
@@ -215,6 +241,35 @@ watch(
           </Tippy>
         </li>
       </template>
+
+      <template #bottom-links>
+        <!-- Settings -->
+        <li>
+          <Tippy placement="right">
+            <RouterLink
+              id="open-settings"
+              :to="{ name: 'settings' }"
+              data-content="Settings"
+            >
+              <i
+                aria-hidden="true"
+                class="iconify sidebar-svg"
+                data-icon="feather:settings"
+              ></i>
+            </RouterLink>
+            <template #content>
+              <div class="v-popover-content is-text">
+                <div class="popover-head">
+                  <h4 class="dark-inverted">Settings</h4>
+                </div>
+                <div class="popover-body">
+                  <p>View Settings.</p>
+                </div>
+              </div>
+            </template>
+          </Tippy>
+        </li>
+      </template>
     </MobileSidebar>
 
     <!-- Mobile subsidebar links -->
@@ -224,6 +279,7 @@ watch(
           v-if="isMobileSidebarOpen && activeMobileSubsidebar === 'dashboard'"
         />
         <ReportsMobileSubsidebar
+          :custom-reports="customReports"
           v-else-if="isMobileSidebarOpen && activeMobileSubsidebar === 'reports'"
           @close="isMobileSidebarOpen = false"
         />

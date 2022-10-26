@@ -61,6 +61,10 @@ const breadcrumb = [
 const defaultValue = ref()
 
 const handleOnSubmit = async (data: any) => {
+  if (isLoading.value) {
+    return
+  }
+
   isLoading.value = true
 
   const payload = {

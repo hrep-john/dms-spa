@@ -29,6 +29,10 @@ const isScrolling = computed(() => {
   return y.value > 30
 })
 
+const isStuck = computed(() => {
+  return y.value > 30
+})
+
 const onAddFile = async (data: any) => {
   if (isLoading.value) {
     return
@@ -51,6 +55,8 @@ const onAddFile = async (data: any) => {
     payload
   )
 
+  isLoading.value = false
+
   if (response.success) {
     const url = response.data.url
     const index = getConfigItemIndex(selectedFileUpload.value)
@@ -60,8 +66,6 @@ const onAddFile = async (data: any) => {
     const error = response?.body?.message
     notyf.error(error)
   }
-
-  isLoading.value = false
 }
 
 const onRemoveFile = (data: any) => {
@@ -99,28 +103,42 @@ const getConfigItemIndex = (key: string) => {
 
 const getConfigItems = () => {
   return {
-    tenant_document_series_id_prefix: {
-      type: 'text',
-      disabled: false,
-      value: getConfigItem('tenant.document.series.id.prefix'),
-    },
-    tenant_document_series_counter_length: {
-      type: 'number',
-      disabled: false,
-      value: getConfigItem('tenant.document.series.counter.length'),
-    },
-    tenant_document_series_current_counter: {
-      type: 'number',
-      disabled: true,
-      value: getConfigItem('tenant.document.series.current.counter'),
-    },
+    tenant_document_series_id_prefix: getConfigItem('tenant.document.series.id.prefix')
+      ?.value,
+    tenant_document_series_counter_length: getConfigItem(
+      'tenant.document.series.counter.length'
+    )?.value,
+    tenant_document_series_current_counter:
+      getConfigItem('tenant.document.series.current.counter')?.value || '',
+    tenant_default_document_user_access: getConfigItem(
+      'tenant.default.document.user.access'
+    )?.value,
+  }
+}
+
+const nextDocumentSeries = computed(() => {
+  const prefix = configItems.value['tenant_document_series_id_prefix']
+  const precision = configItems.value['tenant_document_series_counter_length']
+  const counter = `${configItems.value['tenant_document_series_current_counter']}` || ''
+  const paddedCounter = counter.padStart(precision, '0')
+
+  syncConfigItem('tenant.document.series.id.prefix', prefix)
+  syncConfigItem('tenant.document.series.counter.length', precision)
+  syncConfigItem('tenant.document.series.current.counter', counter)
+
+  return `${prefix}${paddedCounter}`
+})
+
+const syncConfigItem = (key: any, value: any) => {
+  let index = getConfigItemIndex(key)
+
+  if (index > 0) {
+    configs.value[index].value = value
   }
 }
 
 const resetCounterHandler = () => {
-  const config = configItems.value['tenant_document_series_current_counter'].value
-
-  config.value = 1
+  configItems.value['tenant_document_series_current_counter'] = '1'
 }
 
 onMounted(() => {
@@ -138,14 +156,14 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div>
+  <form class="form-layout account-box is-form">
     <VProgress size="tiny" v-show="isLoading" />
-    <div class="account-box is-form is-footerless">
-      <div class="form-head stuck-header" :class="[isScrolling && 'is-stuck']">
-        <div class="form-head-inner">
+    <div class="form-outer">
+      <div :class="[isStuck && 'is-stuck']" class="form-header stuck-header">
+        <div class="form-header-inner">
           <div class="left">
-            <h3>Customize Tenant Settings</h3>
-            <p>Edit your preferred tenant settings</p>
+            <h3>Edit Tenant Settings</h3>
+            <p>Customize your system settings</p>
           </div>
           <div class="right">
             <div class="buttons">
@@ -177,63 +195,244 @@ onBeforeUnmount(() => {
         <div class="fieldset">
           <div class="fieldset-heading">
             <h4>Document Series</h4>
-            <p>This will apply to new documents.</p>
+            <p>This will automatically ingest newly uploaded documents.</p>
           </div>
 
           <div class="columns is-multiline">
-            <div
-              class="column is-3"
-              v-for="(configItem, configItemKey) in configItems"
-              :key="configItemKey"
-            >
+            <div class="column is-12">
               <VField>
-                <label>{{ configItem.value.label }}</label>
+                <label>Document Series Prefix</label>
                 <VControl icon="feather:file-text">
                   <input
-                    :type="configItem.type"
+                    type="text"
                     class="input"
-                    v-model="configItem.value.value"
-                    :disabled="configItem.disabled"
+                    v-model="configItems['tenant_document_series_id_prefix']"
                   />
                 </VControl>
               </VField>
             </div>
-            <div class="column is-3 reset-wrapper">
+            <div class="column is-12">
               <VField>
-                <VButton
-                  color="danger"
-                  icon="feather:refresh-cw"
-                  @click="resetCounterHandler"
-                  raised
-                  rounded
-                >
-                  Reset Counter
-                </VButton>
+                <label>Document Series Precision</label>
+                <VControl icon="feather:file-text">
+                  <input
+                    type="number"
+                    class="input"
+                    v-model="configItems['tenant_document_series_counter_length']"
+                  />
+                </VControl>
+              </VField>
+            </div>
+            <div class="column is-9">
+              <VField>
+                <label>Next Document Series</label>
+                <VControl icon="feather:file-text">
+                  <input
+                    type="text"
+                    class="input"
+                    v-model="nextDocumentSeries"
+                    disabled
+                  />
+                </VControl>
+              </VField>
+            </div>
+            <div class="column is-12">
+              <VField>
+                <label>Reset Document Series</label>
+                <VControl>
+                  <VButton
+                    fullwidth
+                    color="danger"
+                    icon="feather:refresh-cw"
+                    @click="resetCounterHandler"
+                  >
+                    Reset Series
+                  </VButton>
+                </VControl>
               </VField>
             </div>
           </div>
         </div>
+
+        <!--Fieldset-->
+        <div class="fieldset">
+          <div class="fieldset-heading">
+            <h4>Document User Access</h4>
+            <p>
+              This will be the default document user access to newly uploaded documents.
+            </p>
+          </div>
+          <div class="columns is-multiline">
+            <VField>
+              <div class="column is-12">
+                <label>Do you want to allow other users to access this document? </label>
+              </div>
+              <div class="is-12">
+                <VRadio
+                  v-model="configItems['tenant_default_document_user_access']"
+                  :value="1"
+                  @change="syncConfigItem('tenant.default.document.user.access', 1)"
+                  label="Yes, allow all users to access this document."
+                  name="outlined_squared_radio"
+                  color="primary"
+                  square
+                />
+              </div>
+              <div class="is-12">
+                <VRadio
+                  v-model="configItems['tenant_default_document_user_access']"
+                  :value="3"
+                  @change="syncConfigItem('tenant.default.document.user.access', 3)"
+                  label="No, don't allow."
+                  name="outlined_squared_radio"
+                  color="primary"
+                  square
+                />
+              </div>
+            </VField>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+  </form>
 </template>
 
 <style lang="scss" scoped>
-.form-body {
-  .message {
-    margin-bottom: 0.75rem;
-  }
+@import '../../../../scss/abstracts/mixins';
 
-  .fieldset {
-    max-width: unset !important;
-    padding-left: 1.5rem !important;
-    padding-right: 1.5rem !important;
+.is-navbar {
+  .form-layout {
+    margin-top: 30px;
   }
+}
 
-  .reset-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.form-layout {
+  max-width: 740px;
+  margin: 0 auto;
+
+  .form-outer {
+    @include vuero-s-card;
+
+    padding: 0;
+
+    .form-header {
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--fade-grey-dark-3);
+      transition: all 0.3s; // transition-all test
+
+      &.is-stuck {
+        background: var(--white);
+        padding-right: 80px;
+        border-left: 1px solid var(--fade-grey-dark-3);
+      }
+
+      .form-header-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .left {
+        h3 {
+          font-family: var(--font-alt);
+          font-size: 1.2rem;
+          font-weight: 600;
+          line-height: 1.3;
+        }
+
+        p {
+          font-size: 0.95rem;
+        }
+      }
+    }
+
+    .form-body {
+      padding: 20px 40px 40px;
+
+      .fieldset {
+        max-width: unset !important;
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
+      }
+    }
+  }
+}
+
+.is-dark {
+  .form-layout {
+    .form-outer {
+      @include vuero-card--dark;
+
+      .form-header {
+        border-color: var(--dark-sidebar-light-12);
+
+        &.is-stuck {
+          background: var(--dark-sidebar);
+          border-color: var(--dark-sidebar-light-6);
+        }
+
+        .left {
+          h3 {
+            color: var(--dark-dark-text);
+          }
+        }
+      }
+
+      .form-body {
+        .fieldset {
+          max-width: unset !important;
+          padding-left: 1.5rem !important;
+          padding-right: 1.5rem !important;
+        }
+
+        .field {
+          .control {
+            .input,
+            .textarea {
+              &:focus {
+                border-color: var(--primary);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 767px) {
+  .form-layout {
+    .form-outer {
+      .form-header {
+        .form-header-inner {
+          flex-direction: column;
+
+          .left {
+            text-align: center;
+            margin-bottom: 12px;
+          }
+
+          .right {
+            width: 100%;
+
+            .buttons {
+              display: flex;
+              justify-content: space-between;
+              margin: 0;
+
+              .button {
+                margin: 0;
+                width: 49%;
+              }
+            }
+          }
+        }
+      }
+
+      .form-body {
+        padding: 0px !important;
+      }
+    }
   }
 }
 </style>

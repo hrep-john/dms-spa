@@ -17,6 +17,7 @@ meta:
  * @see /src/router.ts
  */
 
+import { useWindowScroll } from '@vueuse/core'
 import { useHead } from '@vueuse/head'
 import { useViewWrapper } from '/@src/stores/viewWrapper'
 import { onMounted, ref, computed } from 'vue'
@@ -50,6 +51,7 @@ const documentService = documentServices.actions
 const userService = userServices.actions
 const udfService = udfServices.actions
 const isLoading = ref(false)
+const isSearching = ref(false)
 const users = ref({
   options: [],
   selected: [],
@@ -91,6 +93,12 @@ const user = computed(() => {
   }
 
   return JSON.parse(userSession.user || '')
+})
+
+const { y } = useWindowScroll()
+
+const isStuck = computed(() => {
+  return y.value > 30
 })
 
 const submit = async () => {
@@ -268,8 +276,14 @@ const getDocumentAuditLogs = async (initial = false) => {
 }
 
 const handleOnDownloadDocument = async (id: any) => {
+  if (isLoading.value) {
+    return
+  }
+
   isLoading.value = true
+
   const payload = { id: id }
+
   const response = await handleVuexApiCall(
     documentService.handleDownloadDocument,
     payload
@@ -284,49 +298,81 @@ const handleOnDownloadDocument = async (id: any) => {
   } else {
     const error = response?.body?.message
     notyf.error(error)
+    isLoading.value = false
   }
 }
 
-const getUserLists = async (initial = false) => {
-  if (isLoading.value && !initial) {
+const getUserLists = async (query = '') => {
+  if (isSearching.value) {
     return
   }
 
-  if (!initial) {
-    isLoading.value = true
-  }
+  isSearching.value = true
 
   const payload: any = {
     filters: [
       // exclude superadmin and admin user level
-      { column: 'user_level', operator: '=', join: 'AND', value: UserLevelEnum.Regular },
+      {
+        column: 'users.user_level',
+        operator: '=',
+        join: 'AND',
+        value: UserLevelEnum.Regular,
+      },
       // exclude current user id
-      { column: 'id', operator: '!=', join: 'AND', value: user.value.id },
+      { column: 'users.id', operator: '!=', join: 'AND', value: user.value.id },
       // exclude document owner
-      { column: 'id', operator: '!=', join: 'AND', value: details.value.created_by },
+      {
+        column: 'users.id',
+        operator: '!=',
+        join: 'AND',
+        value: details.value.created_by,
+      },
+      // filter user first name
+      {
+        column: 'user_infos.first_name',
+        operator: 'LIKE',
+        join: 'AND',
+        value: `%${query}%`,
+      },
+      // filter user last name
+      {
+        column: 'user_infos.last_name',
+        operator: 'LIKE',
+        join: 'AND',
+        value: `%${query}%`,
+      },
     ],
   }
 
+  console.log('getUserLists', query)
+
   const response = await handleVuexApiCall(userService.handleFetchUserList, payload)
 
-  if (!initial) {
-    isLoading.value = false
-  }
+  isSearching.value = false
+
+  let options = []
 
   if (response.success) {
-    users.value.options = formatDropdownOptions(response.data.results)
+    options = formatDropdownOptions(response.data.results)
+    users.value.options = options
   } else {
     const error = response?.body?.message
     notyf.error(error)
   }
+
+  return options
+}
+
+const fetchUserList = async (query: string) => {
+  return users.value.options || (await getUserLists(query))
 }
 
 onMounted(async () => {
   isLoading.value = true
 
   await getUdfs(true)
+  await getUserLists()
   await getDocumentMetadata(true)
-  await getUserLists(true)
   await getDocumentAuditLogs(true)
 
   isLoading.value = false
@@ -354,27 +400,27 @@ onMounted(async () => {
               <div class="left">
                 <h3>Series ID: {{ details.series_id }}</h3>
               </div>
+              <!-- <Tippy placement="top">
+                <VIconButton
+                  color="info"
+                  light
+                  raised
+                  darkOutlined
+                  icon="lnir lnir-download"
+                  @click="handleOnDownloadDocument(routeParams.id)"
+                  class="mr-2"
+                />
+                <template #content>
+                  <div class="v-popover-content is-text">
+                    <div class="popover-head">
+                      <h6 class="dark-inverted">Download</h6>
+                    </div>
+                  </div>
+                </template>
+              </Tippy> -->
               <div class="right">
                 <div class="buttons">
-                  <Tippy placement="top">
-                    <VIconButton
-                      color="info"
-                      light
-                      raised
-                      darkOutlined
-                      icon="lnir lnir-download"
-                      @click="handleOnDownloadDocument(routeParams.id)"
-                    />
-                    <template #content>
-                      <div class="v-popover-content is-text">
-                        <div class="popover-head">
-                          <h6 class="dark-inverted">Download</h6>
-                        </div>
-                      </div>
-                    </template>
-                  </Tippy>
                   <VButton
-                    class="ml-2"
                     icon="lnir lnir-arrow-left rem-100"
                     :to="{ name: 'documents' }"
                     light
@@ -487,7 +533,7 @@ onMounted(async () => {
                   </div>
 
                   <!-- Form Fieldset -->
-                  <div class="form-fieldset">
+                  <div class="form-fieldset" v-if="udfs.length > 0">
                     <div class="fieldset-heading">
                       <h4>User Defined Metadata</h4>
                       <p>
@@ -498,7 +544,7 @@ onMounted(async () => {
                     <div class="columns is-multiline">
                       <div class="column is-12" v-for="(udf, key) in udfs" :key="key">
                         <!-- TEXT FIELD -->
-                        <label>{{ udf.name }}</label>
+                        <p>{{ udf.name }}</p>
 
                         <textarea
                           type="textarea"
@@ -573,29 +619,43 @@ onMounted(async () => {
                     </div>
 
                     <div class="columns is-multiline">
-                      <div class="column is-12">
-                        <VField>
+                      <VField>
+                        <div class="column is-12">
                           <label
                             >Do you want to allow other users to access this document?
                           </label>
+                        </div>
+                        <div class="is-12">
                           <VRadio
                             v-model="details.allow_user_access"
-                            :value="true"
-                            label="Yes"
+                            :value="1"
+                            label="Yes, allow all users to access this document."
                             name="outlined_squared_radio"
                             color="primary"
                             square
                           />
+                        </div>
+                        <div class="is-12">
                           <VRadio
                             v-model="details.allow_user_access"
-                            :value="false"
-                            label="No"
+                            :value="2"
+                            label="Yes, allow selected users to access this document."
                             name="outlined_squared_radio"
                             color="primary"
                             square
                           />
-                        </VField>
-                      </div>
+                        </div>
+                        <div class="is-12">
+                          <VRadio
+                            v-model="details.allow_user_access"
+                            :value="3"
+                            label="No, don't allow."
+                            name="outlined_squared_radio"
+                            color="primary"
+                            square
+                          />
+                        </div>
+                      </VField>
                     </div>
                   </div>
 
@@ -610,11 +670,17 @@ onMounted(async () => {
                         <VField>
                           <Multiselect
                             v-model="users.selected"
-                            mode="tags"
                             placeholder="Enter user's full name here..."
-                            :searchable="true"
+                            mode="tags"
                             :disabled="isLoading"
-                            :options="users.options"
+                            :loading="isSearching"
+                            :infinite="true"
+                            :limit="10"
+                            :close-on-select="false"
+                            :clear-on-search="true"
+                            :delay="0"
+                            :searchable="true"
+                            :options="fetchUserList"
                           />
                         </VField>
                       </div>
