@@ -217,11 +217,16 @@ export default defineConfig({
      */
     VitePWA({
       base: '/',
+      registerType: 'autoUpdate',
+      workbox: {
+        clientsClaim: true,
+        skipWaiting: true,
+      },
       includeAssets: ['favicon.svg', 'favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Vuero - A complete Vue 3 design system',
-        short_name: 'Vuero',
-        start_url: '/?utm_source=pwa',
+        name: 'Document Management System',
+        short_name: 'DMS',
+        start_url: '/',
         display: 'standalone',
         theme_color: '#ffffff',
         background_color: '#ffffff',

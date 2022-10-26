@@ -22,7 +22,7 @@ const getItemDescription = (item: { event: ''; filename: '' }) => {
 
   switch (item.event) {
     case EventEnum.Created:
-      description = ` Uploaded a file (${item.filename}).`
+      description = ` Created new document record.`
       break
     case EventEnum.Updated:
       description = ' Edited the following fields: '
@@ -35,6 +35,9 @@ const getItemDescription = (item: { event: ''; filename: '' }) => {
       break
     case EventEnum.Viewed:
       description = ` Viewed this file (${item.filename}).`
+      break
+    case EventEnum.Uploaded:
+      description = ` Uploaded new file version (${item.filename}).`
       break
   }
 

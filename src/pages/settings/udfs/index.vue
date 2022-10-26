@@ -40,7 +40,7 @@ viewWrapper.setPageTitle('User Defined Field List')
 
 const service = udfServices.actions
 
-const isLoading = ref(true)
+const isLoading = ref(false)
 const search = ref('')
 const datatable = ref({ data: [], meta: {} })
 const page = ref(1)
@@ -71,6 +71,10 @@ const breadcrumb = [
 ]
 
 const paginate = async (page = 1) => {
+  if (isLoading.value) {
+    return
+  }
+
   isLoading.value = true
 
   const payload = {
@@ -172,10 +176,18 @@ const getSelectedRow = (id: any) => {
 }
 
 const handleOnDeletedRecord = async (close: Function) => {
+  if (isLoading.value) {
+    return
+  }
+
+  isLoading.value = true
+
   const response = await handleVuexApiCall(
     service.handleDeleteUdf,
     deleteConfirm.value.selected
   )
+
+  isLoading.value = false
 
   if (response.success) {
     notyf.success('Deleted successfully.')

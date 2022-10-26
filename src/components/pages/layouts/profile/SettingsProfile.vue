@@ -299,7 +299,7 @@ const isAdmin = computed(() => {
     .profile-body {
       .settings-section {
         .settings-box {
-          width: calc(50% - 16px);
+          width: calc(100% - 16px);
         }
       }
     }
@@ -311,7 +311,7 @@ const isAdmin = computed(() => {
     .profile-body {
       .settings-section {
         .settings-box {
-          width: calc(25% - 16px);
+          width: calc(100% - 16px);
         }
       }
     }

@@ -61,6 +61,12 @@ const formatErrors = (errors: any) => {
 }
 
 const proceedToLogin = async (values: any) => {
+  if (isLoading.value) {
+    return
+  }
+
+  isLoading.value = true
+
   sleep(200)
 
   const payload = {

@@ -39,7 +39,7 @@ viewWrapper.setPageTitle('')
 
 const service = customReportService.actions
 
-const isLoading = ref(true)
+const isLoading = ref(false)
 const search = ref('')
 const datatable = ref({ data: [], meta: {} })
 const page = ref(1)
@@ -51,6 +51,10 @@ const filters = ref({
 })
 
 const fetchCustomReport = async (page = 1) => {
+  if (isLoading.value) {
+    return
+  }
+
   isLoading.value = true
 
   const payload = {
@@ -235,6 +239,12 @@ onBeforeUnmount(() => {
     img.logo {
       width: 60px;
       height: 60px;
+    }
+  }
+
+  table {
+    td {
+      color: #000 !important;
     }
   }
 

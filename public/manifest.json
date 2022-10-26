@@ -1,5 +1,8 @@
 {
- "name": "App",
+ "name": "Document Management System",
+ "short_name": "DMS",
+ "start_url": "/",
+ "display": "standalone",
  "icons": [
   {
    "src": "\/android-icon-36x36.png",
