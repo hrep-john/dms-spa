@@ -406,7 +406,14 @@ onBeforeUnmount(() => {
         </Tippy>
 
         <VButtons>
-          <VButton color="info" icon="fas fa-print" @click="print"> Print </VButton>
+          <VButton
+            v-if="doesUserCan('Report: Print')"
+            color="info"
+            icon="fas fa-print"
+            @click="print"
+          >
+            Print
+          </VButton>
         </VButtons>
       </div>
 
