@@ -191,7 +191,7 @@ watch(
             </template>
           </Tippy>
         </li>
-        <li>
+        <li v-if="doesUserCan('Report: View')">
           <Tippy placement="right">
             <a
               :class="[activeMobileSubsidebar === 'reports' && 'is-active']"
@@ -378,7 +378,7 @@ watch(
             </template>
           </Tippy>
         </li>
-        <li>
+        <li v-if="doesUserCan('Report: View')">
           <Tippy placement="right">
             <a
               :class="[activeMobileSubsidebar === 'reports' && 'is-active']"
