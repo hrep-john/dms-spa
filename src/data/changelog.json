@@ -1,6 +1,18 @@
 {
-  "current_version": "1.0.1",
+  "current_version": "1.0.2",
   "versions": [
+    {
+      "release_number": "1.0.2",
+      "date": "2022-10-27",
+      "features": [
+        {
+          "subject": "Tenant Settings > Document User Access",
+          "description": "Users can now configure the default document user access. Default settings: No, don't allow."
+        }
+      ],
+      "enhancements": [],
+      "bug_fixes": []
+    },
     {
       "release_number": "1.0.1",
       "date": "2022-10-19",
