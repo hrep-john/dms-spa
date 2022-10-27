@@ -224,7 +224,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <form class="form-layout account-box is-form">
+  <div class="form-layout account-box is-form">
     <VProgress size="tiny" v-show="isLoading" />
     <div class="form-outer">
       <div :class="[isStuck && 'is-stuck']" class="form-header stuck-header">
@@ -292,7 +292,7 @@ onBeforeUnmount(() => {
         </div>
       </div>
     </div>
-  </form>
+  </div>
 </template>
 
 <style lang="scss" scoped>
