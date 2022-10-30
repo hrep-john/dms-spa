@@ -15,6 +15,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
 window.addEventListener('appinstalled', () => {
   console.log('appinstalled')
   deferredPrompt.value = null
+  show.value = true
 })
 
 const onClose = () => {
