@@ -486,6 +486,7 @@ watch(
           <slot></slot>
         </template>
         <VPageContent v-else class="is-relative">
+          <VBanner />
           <div class="page-title has-text-centered">
             <!-- Sidebar Trigger -->
             <div

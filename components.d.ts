@@ -65,6 +65,7 @@ declare module 'vue' {
     VAnimatedCheckbox: typeof import('./src/components/base/form/VAnimatedCheckbox.vue')['default']
     VAvatar: typeof import('./src/components/base/avatar/VAvatar.vue')['default']
     VAvatarStack: typeof import('./src/components/base/avatar/VAvatarStack.vue')['default']
+    VBanner: typeof import('./src/components/base/banner/VBanner.vue')['default']
     VBillboardJS: typeof import('./src/components/base/plugins/VBillboardJS.vue')['default']
     VBlock: typeof import('./src/components/base/block/VBlock.vue')['default']
     VBreadcrumb: typeof import('./src/components/base/breadcrumb/VBreadcrumb.vue')['default']
